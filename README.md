@@ -20,12 +20,19 @@ La lógica vive en [`docs/rules.js`](docs/rules.js) y la usan tanto la web como 
 
 ## Aviso importante de privacidad
 
-Este repositorio es **privado**, pero la carpeta `docs/` se publica como **GitHub Pages, que es pública**
-por defecto aunque el repo no lo sea. Por eso:
+Este repositorio es **público** (decisión consciente: GitHub Pages con repo privado requiere
+GitHub Pro, y se prefirió no pagar ni mantener un segundo repositorio solo para la web). Eso significa
+que **cualquiera con el enlace puede ver todo el contenido**, incluido `data/*.json`.
 
-- La web (`docs/`) nunca pide ni muestra el motivo de una ausencia, solo si alguien está disponible o no.
-- Los datos reales (`data/*.json`) **no** se publican en Pages — solo son visibles para quien tenga acceso
-  al repositorio en GitHub. No los subas ni los pegues en ningún sitio público.
+Para limitar el impacto de eso:
+
+- La web nunca pide ni muestra el motivo de una ausencia, solo si alguien está disponible o no.
+- `data/*.json` solo debe contener, para cada sábado, el grupo y la lista de quién falta —
+  nunca el motivo (vacaciones/baja/permiso), ni ningún otro dato personal.
+
+Si en algún momento se prefiere que los datos dejen de ser públicos, las opciones son: pasar a
+GitHub Pro y volver a poner el repo en privado, o mover `data/`, `scripts/` y el workflow a un
+segundo repositorio privado aparte, dejando aquí solo la web (`docs/`).
 
 ## Cómo se usa el día a día
 
