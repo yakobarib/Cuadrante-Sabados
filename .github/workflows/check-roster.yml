@@ -1,0 +1,34 @@
+name: Comprobar cuadrante de sábados
+
+on:
+  push:
+    paths:
+      - "data/**.json"
+  workflow_dispatch: {}
+
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Ejecutar comprobación de reglas
+        id: check
+        run: node scripts/check-roster.mjs
+
+      - name: Enviar email si hay incidencias
+        if: steps.check.outputs.hay_incidencias == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_HOST }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASS }}
+          to: ${{ secrets.MAIL_TO }}
+          from: Cuadrante Sábados
+          subject: "⚠️ Incidencia en el cuadrante de sábados"
+          body: ${{ steps.check.outputs.detalle }}

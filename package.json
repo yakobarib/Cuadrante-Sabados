@@ -1,0 +1,7 @@
+{
+  "name": "cuadrante-sabados",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Cuadrante de sábados (Teléfonos/Mostrador) y comprobación automática de mínimos."
+}
