@@ -366,39 +366,58 @@ function formatearFechaDDMM(fechaIso) {
   return `${dia}/${mes}`;
 }
 
-function generarHojaImpresion() {
-  const resultados = sabados.map((s) => ({ ...s, resultado: calcularSabado(s) }));
+function renderTarjetaImpresion(sabado) {
+  const resultado = calcularSabado(sabado);
 
-  const celdasFecha = resultados.map((r) => `<td>${formatearFechaDDMM(r.fecha)}</td>`).join("");
-  const celdasTelefonos = resultados
-    .map((r) => `<td>${r.resultado.festivo ? "FESTIVO" : r.resultado.telefonos.join(", ") || "—"}</td>`)
-    .join("");
-  const celdasMostrador = resultados
-    .map((r) => `<td>${r.resultado.festivo ? "FESTIVO" : r.resultado.mostrador.join(", ") || "—"}</td>`)
-    .join("");
-  const celdasGrupo = resultados
-    .map((r) => `<td>${r.resultado.festivo ? "" : r.grupo ?? ""}</td>`)
-    .join("");
-  const hayIncidencias = resultados.some((r) => r.resultado.incidencias?.length);
-  const filaIncidencias = hayIncidencias
-    ? `<tr class="fila-incidencias"><th>Incidencias</th>${resultados
-        .map((r) => `<td>${r.resultado.incidencias?.join(" · ") || ""}</td>`)
-        .join("")}</tr>`
+  if (resultado.festivo) {
+    return `
+      <article class="tarjeta estado-festivo">
+        <div class="tarjeta-cabecera">
+          <h2>Sábado ${formatearFechaDDMM(sabado.fecha)}</h2>
+          <span class="pill pill-festivo">${ETIQUETAS_ESTADO.festivo}</span>
+        </div>
+        <p class="nota-festivo">No hay actividad este sábado.</p>
+      </article>
+    `;
+  }
+
+  const chipsTelefonos = resultado.telefonos.map((p) => `<span class="chip">${p}</span>`).join("");
+  const chipsMostrador = resultado.mostrador.map((p) => `<span class="chip">${p}</span>`).join("");
+  const aviso = resultado.incidencias.length
+    ? `<div class="aviso-incidencia">${resultado.incidencias.join(" · ")}</div>`
     : "";
 
+  return `
+    <article class="tarjeta estado-${resultado.estado}">
+      <div class="tarjeta-cabecera">
+        <h2>Sábado ${formatearFechaDDMM(sabado.fecha)} · Grupo ${sabado.grupo}</h2>
+        <span class="pill pill-${resultado.estado}">${ETIQUETAS_ESTADO[resultado.estado]}</span>
+      </div>
+      <div class="columnas-roles">
+        <div class="columna-personas">
+          <h3>☎ Teléfonos</h3>
+          <div class="chips">${chipsTelefonos}</div>
+        </div>
+        <div class="columna-personas">
+          <h3>🧾 Mostrador</h3>
+          <div class="chips">${chipsMostrador}</div>
+        </div>
+      </div>
+      ${aviso}
+    </article>
+  `;
+}
+
+function generarHojaImpresion() {
   const grupo1 = GRUPOS[1];
   const grupo2 = GRUPOS[2];
 
   hojaImpresion.innerHTML = `
-    <h1>Calendario sábados — ${nombreMesLegible(mesActual)}</h1>
-    <table class="tabla-impresion">
-      <tr><th>Fecha</th>${celdasFecha}</tr>
-      <tr><th>Teléfonos</th>${celdasTelefonos}</tr>
-      <tr><th>Mostrador</th>${celdasMostrador}</tr>
-      <tr><th>Grupo</th>${celdasGrupo}</tr>
-      ${filaIncidencias}
-    </table>
-    <p class="leyenda-grupos">
+    <h1>📅 Cuadrante Sábados — ${nombreMesLegible(mesActual)}</h1>
+    <div class="lista-sabados">
+      ${sabados.map(renderTarjetaImpresion).join("")}
+    </div>
+    <p class="leyenda-impresion">
       <strong>Grupo 1</strong> — Teléfonos: ${grupo1.telefonos.join(", ")}.
       Mostrador: ${grupo1.mostrador.join(", ")}.<br />
       <strong>Grupo 2</strong> — Teléfonos: ${grupo2.telefonos.join(", ")}.

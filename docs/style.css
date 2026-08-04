@@ -177,6 +177,16 @@ button { font: inherit; cursor: pointer; }
 }
 .btn-secundario:hover { border-color: var(--accent); }
 
+.btn-primario:focus, .btn-secundario:focus,
+.toggle:focus, .chip:focus {
+  outline: none;
+}
+.btn-primario:focus-visible, .btn-secundario:focus-visible,
+.toggle:focus-visible, .chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .lista-sabados {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -382,11 +392,16 @@ textarea {
 #hoja-impresion { display: none; }
 
 @media print {
-  @page { size: A4 portrait; margin: 15mm; }
+  @page { size: A4 portrait; margin: 12mm; }
 
+  html, body { background: #fff; }
   body * { visibility: hidden; }
 
-  #hoja-impresion, #hoja-impresion * { visibility: visible; }
+  #hoja-impresion, #hoja-impresion * {
+    visibility: visible;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 
   #hoja-impresion {
     display: block;
@@ -395,37 +410,34 @@ textarea {
     left: 0;
     width: 100%;
     color: #000;
-    background: #fff;
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   }
 
   #hoja-impresion h1 {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     text-align: center;
-    margin: 0 0 1rem;
+    margin: 0 0 0.85rem;
   }
 
-  .tabla-impresion {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
+  #hoja-impresion .lista-sabados {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.55rem;
   }
-  .tabla-impresion th, .tabla-impresion td {
-    border: 1px solid #000;
-    padding: 0.4rem 0.5rem;
-    text-align: center;
-    vertical-align: middle;
-  }
-  .tabla-impresion th {
-    background: #eee;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-  .tabla-impresion .fila-incidencias td { color: #b00; font-weight: 700; }
 
-  .leyenda-grupos {
-    margin-top: 1.25rem;
-    font-size: 0.85rem;
+  #hoja-impresion .tarjeta {
+    padding: 0.6rem 0.75rem;
+    break-inside: avoid;
+  }
+  #hoja-impresion .tarjeta-cabecera h2 { font-size: 1rem; }
+  #hoja-impresion .columnas-roles { gap: 0.75rem; margin: 0.5rem 0; }
+  #hoja-impresion .columna-personas h3 { font-size: 0.8rem; }
+  #hoja-impresion .chip { font-size: 0.8rem; padding: 0.25rem 0.6rem; }
+  #hoja-impresion .resumen,
+  #hoja-impresion .aviso-incidencia { font-size: 0.85rem; }
+
+  #hoja-impresion .leyenda-impresion {
+    margin-top: 0.85rem;
+    font-size: 0.8rem;
     line-height: 1.5;
+    color: #000;
   }
 }
