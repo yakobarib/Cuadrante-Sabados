@@ -392,7 +392,7 @@ textarea {
 #hoja-impresion { display: none; }
 
 @media print {
-  @page { size: A4 portrait; margin: 12mm; }
+  @page { size: A4 portrait; margin: 16mm 18mm; }
 
   html, body { background: #fff; }
   body * { visibility: hidden; }
@@ -409,35 +409,109 @@ textarea {
     top: 0;
     left: 0;
     width: 100%;
-    color: #000;
+    color: #1a1a1a;
+    font-family: Georgia, "Times New Roman", serif;
   }
 
   #hoja-impresion h1 {
-    font-size: 1.25rem;
+    font-size: 1.6rem;
     text-align: center;
-    margin: 0 0 0.85rem;
+    letter-spacing: 0.02em;
+    color: #17284d;
+    margin: 0 0 0.15rem;
   }
 
-  #hoja-impresion .lista-sabados {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.55rem;
+  #hoja-impresion .subtitulo-impresion {
+    text-align: center;
+    font-style: italic;
+    color: #5a5a5a;
+    margin: 0 0 1.1rem;
+    font-size: 1rem;
   }
 
-  #hoja-impresion .tarjeta {
-    padding: 0.6rem 0.75rem;
+  #hoja-impresion .subtitulo-impresion::after {
+    content: "";
+    display: block;
+    width: 90px;
+    height: 2px;
+    background: #c9972e;
+    margin: 0.6rem auto 0;
+  }
+
+  #hoja-impresion .bloque-fin-semana {
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid #ddd;
     break-inside: avoid;
   }
-  #hoja-impresion .tarjeta-cabecera h2 { font-size: 1rem; }
-  #hoja-impresion .columnas-roles { gap: 0.75rem; margin: 0.5rem 0; }
-  #hoja-impresion .columna-personas h3 { font-size: 0.8rem; }
-  #hoja-impresion .chip { font-size: 0.8rem; padding: 0.25rem 0.6rem; }
-  #hoja-impresion .resumen,
-  #hoja-impresion .aviso-incidencia { font-size: 0.85rem; }
+  #hoja-impresion .bloque-fin-semana:last-of-type {
+    border-bottom: none;
+  }
 
-  #hoja-impresion .leyenda-impresion {
-    margin-top: 0.85rem;
-    font-size: 0.8rem;
-    line-height: 1.5;
-    color: #000;
+  #hoja-impresion h2 {
+    font-size: 1.05rem;
+    color: #17284d;
+    margin: 0 0 0.45rem;
+    font-weight: 700;
+  }
+
+  #hoja-impresion .lista-roles {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  #hoja-impresion .lista-roles > li.rol {
+    margin: 0 0 0.4rem;
+  }
+
+  #hoja-impresion .etiqueta-rol {
+    position: relative;
+    display: inline-block;
+    padding-left: 1.1rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #1a1a1a;
+  }
+  #hoja-impresion .etiqueta-rol::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #1a1a1a;
+  }
+
+  #hoja-impresion .lista-personas {
+    list-style: none;
+    margin: 0.2rem 0 0;
+    padding: 0;
+  }
+  #hoja-impresion .lista-personas li {
+    position: relative;
+    padding-left: 2.3rem;
+    color: #a3721c;
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+  #hoja-impresion .lista-personas li::before {
+    content: "○";
+    position: absolute;
+    left: 1.1rem;
+    font-size: 0.7rem;
+    top: 0.15em;
+  }
+
+  #hoja-impresion .nota-festivo-impresion {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-style: italic;
+    color: #666;
+    margin: 0;
+  }
+
+  #hoja-impresion .incidencia-impresion {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: #b91c1c;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin: 0.4rem 0 0;
   }
 }

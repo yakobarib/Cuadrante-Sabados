@@ -366,63 +366,55 @@ function formatearFechaDDMM(fechaIso) {
   return `${dia}/${mes}`;
 }
 
-function renderTarjetaImpresion(sabado) {
+function formatearFechaLarga(fechaIso) {
+  const [, mes, dia] = fechaIso.split("-");
+  const nombres = [
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+  ];
+  return `${Number(dia)} de ${nombres[Number(mes) - 1]}`;
+}
+
+function renderBloqueImpresion(sabado, numero) {
   const resultado = calcularSabado(sabado);
 
   if (resultado.festivo) {
     return `
-      <article class="tarjeta estado-festivo">
-        <div class="tarjeta-cabecera">
-          <h2>Sábado ${formatearFechaDDMM(sabado.fecha)}</h2>
-          <span class="pill pill-festivo">${ETIQUETAS_ESTADO.festivo}</span>
-        </div>
-        <p class="nota-festivo">No hay actividad este sábado.</p>
-      </article>
+      <section class="bloque-fin-semana">
+        <h2>${numero}. Sábado ${formatearFechaLarga(sabado.fecha)} — Festivo</h2>
+        <p class="nota-festivo-impresion">No hay actividad este sábado.</p>
+      </section>
     `;
   }
 
-  const chipsTelefonos = resultado.telefonos.map((p) => `<span class="chip">${p}</span>`).join("");
-  const chipsMostrador = resultado.mostrador.map((p) => `<span class="chip">${p}</span>`).join("");
-  const aviso = resultado.incidencias.length
-    ? `<div class="aviso-incidencia">${resultado.incidencias.join(" · ")}</div>`
+  const itemsPersonas = (personas) => personas.map((p) => `<li>${p}</li>`).join("");
+  const incidencia = resultado.incidencias.length
+    ? `<p class="incidencia-impresion">⚠ ${resultado.incidencias.join(" · ")}</p>`
     : "";
 
   return `
-    <article class="tarjeta estado-${resultado.estado}">
-      <div class="tarjeta-cabecera">
-        <h2>Sábado ${formatearFechaDDMM(sabado.fecha)} · Grupo ${sabado.grupo}</h2>
-        <span class="pill pill-${resultado.estado}">${ETIQUETAS_ESTADO[resultado.estado]}</span>
-      </div>
-      <div class="columnas-roles">
-        <div class="columna-personas">
-          <h3>☎ Teléfonos</h3>
-          <div class="chips">${chipsTelefonos}</div>
-        </div>
-        <div class="columna-personas">
-          <h3>🧾 Mostrador</h3>
-          <div class="chips">${chipsMostrador}</div>
-        </div>
-      </div>
-      ${aviso}
-    </article>
+    <section class="bloque-fin-semana">
+      <h2>${numero}. Sábado ${formatearFechaLarga(sabado.fecha)} — Grupo ${sabado.grupo}</h2>
+      <ul class="lista-roles">
+        <li class="rol">
+          <span class="etiqueta-rol">Teléfonos</span>
+          <ul class="lista-personas">${itemsPersonas(resultado.telefonos)}</ul>
+        </li>
+        <li class="rol">
+          <span class="etiqueta-rol">Mostrador</span>
+          <ul class="lista-personas">${itemsPersonas(resultado.mostrador)}</ul>
+        </li>
+      </ul>
+      ${incidencia}
+    </section>
   `;
 }
 
 function generarHojaImpresion() {
-  const grupo1 = GRUPOS[1];
-  const grupo2 = GRUPOS[2];
-
   hojaImpresion.innerHTML = `
-    <h1>📅 Cuadrante Sábados — ${nombreMesLegible(mesActual)}</h1>
-    <div class="lista-sabados">
-      ${sabados.map(renderTarjetaImpresion).join("")}
-    </div>
-    <p class="leyenda-impresion">
-      <strong>Grupo 1</strong> — Teléfonos: ${grupo1.telefonos.join(", ")}.
-      Mostrador: ${grupo1.mostrador.join(", ")}.<br />
-      <strong>Grupo 2</strong> — Teléfonos: ${grupo2.telefonos.join(", ")}.
-      Mostrador: ${grupo2.mostrador.join(", ")}.
-    </p>
+    <h1>Cuadrante Sábados</h1>
+    <p class="subtitulo-impresion">${nombreMesLegible(mesActual).replace(/^./, (c) => c.toUpperCase())}</p>
+    ${sabados.map((s, i) => renderBloqueImpresion(s, i + 1)).join("")}
   `;
 }
 
