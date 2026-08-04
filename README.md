@@ -36,16 +36,26 @@ segundo repositorio privado aparte, dejando aquí solo la web (`docs/`).
 
 ## Cómo se usa el día a día
 
-1. Abre la web publicada en Pages (ver más abajo cómo activarla).
-2. En "1. Elegir mes", genera los sábados en blanco de un mes nuevo, o pega el JSON de un mes
-   que ya exista en `data/` (cópialo desde GitHub) para seguir editándolo.
-3. En "2. Marcar ausencias", marca festivo/grupo/ausentes de cada sábado según te vayan llegando
-   las capturas. El resultado (Teléfonos, Mostrador, incidencias) se recalcula al momento.
-4. En "3. Guardar en GitHub", pulsa "Copiar JSON del mes" y luego el enlace "Abrir data/&lt;mes&gt;.json
-   en GitHub". Pega el JSON copiado sustituyendo el contenido del archivo y confirma el commit
-   ("Commit changes").
-5. Ese commit dispara automáticamente la comprobación (`.github/workflows/check-roster.yml`).
+1. Abre la web publicada en Pages. Los meses que ya existen en `data/` se cargan solos en el
+   desplegable "Mes" — no hace falta copiar ni pegar nada para verlos.
+2. Para un mes nuevo, usa "+ Nuevo mes" (te pregunta el mes en formato AAAA-MM y si el primer
+   sábado lo hace el Grupo 1 o el Grupo 2).
+3. Según te vayan llegando las capturas, marca en cada tarjeta: festivo, grupo, y pulsando el
+   nombre de cada persona la marcas como ausente (vuelve a pulsar para deshacerlo). El resultado
+   (quién cubre Teléfonos/Mostrador y si hay incidencia) se recalcula al momento.
+4. Pulsa "💾 Guardar cambios":
+   - Si tienes el guardado automático configurado (ver abajo), se guarda directamente y ya está.
+   - Si no, te avisa para que uses "Opciones avanzadas → Guardado manual" (copiar JSON y
+     pegarlo en GitHub a mano).
+5. Guardar dispara automáticamente la comprobación (`.github/workflows/check-roster.yml`).
    Si hay alguna incidencia, te llega un email.
+
+### Activar el guardado automático (opcional, recomendado)
+
+En "⚙️ Opciones avanzadas → Guardado automático" tienes el enlace y los pasos para crear un
+token de GitHub limitado solo a este repositorio (permiso "Contents: Read and write", nada más).
+Se guarda únicamente en el navegador donde lo pegues — si usas otro ordenador o navegador, hay
+que configurarlo otra vez ahí.
 
 ## Puesta en marcha (una sola vez)
 
