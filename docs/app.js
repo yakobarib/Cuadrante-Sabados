@@ -232,20 +232,18 @@ function renderTarjeta(sabado) {
   });
   controles.appendChild(btnFestivo);
 
-  if (!sabado.festivo) {
-    [1, 2].forEach((g) => {
-      const btnGrupo = document.createElement("button");
-      btnGrupo.type = "button";
-      btnGrupo.className = "toggle" + (Number(sabado.grupo) === g ? " activo" : "");
-      btnGrupo.textContent = `Grupo ${g}`;
-      btnGrupo.addEventListener("click", () => {
-        sabado.grupo = g;
-        sabado.ausentes = [];
-        render();
-      });
-      controles.appendChild(btnGrupo);
+  [1, 2].forEach((g) => {
+    const btnGrupo = document.createElement("button");
+    btnGrupo.type = "button";
+    btnGrupo.className = "toggle" + (Number(sabado.grupo) === g ? " activo" : "");
+    btnGrupo.textContent = `Grupo ${g}`;
+    btnGrupo.addEventListener("click", () => {
+      sabado.grupo = g;
+      sabado.ausentes = [];
+      render();
     });
-  }
+    controles.appendChild(btnGrupo);
+  });
 
   tarjeta.appendChild(controles);
 
@@ -379,9 +377,10 @@ function renderBloqueImpresion(sabado, numero) {
   const resultado = calcularSabado(sabado);
 
   if (resultado.festivo) {
+    const grupoTexto = sabado.grupo ? ` Grupo ${sabado.grupo}` : "";
     return `
       <section class="bloque-fin-semana">
-        <h2>${numero}. Sábado ${formatearFechaLarga(sabado.fecha)} — Festivo</h2>
+        <h2>${numero}. Sábado ${formatearFechaLarga(sabado.fecha)} — Festivo${grupoTexto}</h2>
         <p class="nota-festivo-impresion">No hay actividad este sábado.</p>
       </section>
     `;

@@ -3,8 +3,8 @@
   "nota": "Mes de prueba (beta) cargado a partir de 'Organización Sabado AGOSTO-2026.docx'.",
   "sabados": [
     { "fecha": "2026-08-01", "grupo": 2, "festivo": false, "ausentes": [] },
-    { "fecha": "2026-08-08", "grupo": null, "festivo": true, "ausentes": [] },
-    { "fecha": "2026-08-15", "grupo": null, "festivo": true, "ausentes": [] },
+    { "fecha": "2026-08-08", "grupo": 1, "festivo": true, "ausentes": [] },
+    { "fecha": "2026-08-15", "grupo": 2, "festivo": true, "ausentes": [] },
     { "fecha": "2026-08-22", "grupo": 1, "festivo": false, "ausentes": [] },
     { "fecha": "2026-08-29", "grupo": 2, "festivo": false, "ausentes": [] }
   ]
