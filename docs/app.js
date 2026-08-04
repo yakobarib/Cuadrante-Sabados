@@ -25,6 +25,8 @@ const linkGithub = el("link-github");
 const outputJson = el("output-json");
 const inputJson = el("input-json");
 const btnCargarJson = el("btn-cargar-json");
+const btnImprimir = el("btn-imprimir");
+const hojaImpresion = el("hoja-impresion");
 
 let mesActual = null;
 let sabados = [];
@@ -355,6 +357,60 @@ btnCargarJson.addEventListener("click", () => {
   } catch (e) {
     alert("El JSON no es válido: " + e.message);
   }
+});
+
+// ---------- Impresión (A4) ----------
+
+function formatearFechaDDMM(fechaIso) {
+  const [, mes, dia] = fechaIso.split("-");
+  return `${dia}/${mes}`;
+}
+
+function generarHojaImpresion() {
+  const resultados = sabados.map((s) => ({ ...s, resultado: calcularSabado(s) }));
+
+  const celdasFecha = resultados.map((r) => `<td>${formatearFechaDDMM(r.fecha)}</td>`).join("");
+  const celdasTelefonos = resultados
+    .map((r) => `<td>${r.resultado.festivo ? "FESTIVO" : r.resultado.telefonos.join(", ") || "—"}</td>`)
+    .join("");
+  const celdasMostrador = resultados
+    .map((r) => `<td>${r.resultado.festivo ? "FESTIVO" : r.resultado.mostrador.join(", ") || "—"}</td>`)
+    .join("");
+  const celdasGrupo = resultados
+    .map((r) => `<td>${r.resultado.festivo ? "" : r.grupo ?? ""}</td>`)
+    .join("");
+  const hayIncidencias = resultados.some((r) => r.resultado.incidencias?.length);
+  const filaIncidencias = hayIncidencias
+    ? `<tr class="fila-incidencias"><th>Incidencias</th>${resultados
+        .map((r) => `<td>${r.resultado.incidencias?.join(" · ") || ""}</td>`)
+        .join("")}</tr>`
+    : "";
+
+  const grupo1 = GRUPOS[1];
+  const grupo2 = GRUPOS[2];
+
+  hojaImpresion.innerHTML = `
+    <h1>Calendario sábados — ${nombreMesLegible(mesActual)}</h1>
+    <table class="tabla-impresion">
+      <tr><th>Fecha</th>${celdasFecha}</tr>
+      <tr><th>Teléfonos</th>${celdasTelefonos}</tr>
+      <tr><th>Mostrador</th>${celdasMostrador}</tr>
+      <tr><th>Grupo</th>${celdasGrupo}</tr>
+      ${filaIncidencias}
+    </table>
+    <p class="leyenda-grupos">
+      <strong>Grupo 1</strong> — Teléfonos: ${grupo1.telefonos.join(", ")}.
+      Mostrador: ${grupo1.mostrador.join(", ")}.<br />
+      <strong>Grupo 2</strong> — Teléfonos: ${grupo2.telefonos.join(", ")}.
+      Mostrador: ${grupo2.mostrador.join(", ")}.
+    </p>
+  `;
+}
+
+btnImprimir.addEventListener("click", () => {
+  if (!mesActual || !sabados.length) return;
+  generarHojaImpresion();
+  window.print();
 });
 
 // ---------- Guardado ----------

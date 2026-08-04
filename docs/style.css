@@ -96,10 +96,22 @@ main {
   text-align: center;
 }
 
+.columna-derecha {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: stretch;
+  flex: 0 0 auto;
+  align-self: flex-start;
+}
+
 .avanzado {
   position: relative;
   flex: 0 0 auto;
-  align-self: flex-start;
+}
+
+#btn-imprimir {
+  white-space: nowrap;
 }
 
 .campo {
@@ -363,4 +375,57 @@ textarea {
   border: 1px solid var(--border);
   background: var(--bg);
   color: var(--text);
+}
+
+/* ---------- Impresión (A4) ---------- */
+
+#hoja-impresion { display: none; }
+
+@media print {
+  @page { size: A4 portrait; margin: 15mm; }
+
+  body * { visibility: hidden; }
+
+  #hoja-impresion, #hoja-impresion * { visibility: visible; }
+
+  #hoja-impresion {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    color: #000;
+    background: #fff;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  #hoja-impresion h1 {
+    font-size: 1.3rem;
+    text-align: center;
+    margin: 0 0 1rem;
+  }
+
+  .tabla-impresion {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .tabla-impresion th, .tabla-impresion td {
+    border: 1px solid #000;
+    padding: 0.4rem 0.5rem;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .tabla-impresion th {
+    background: #eee;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .tabla-impresion .fila-incidencias td { color: #b00; font-weight: 700; }
+
+  .leyenda-grupos {
+    margin-top: 1.25rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
 }
