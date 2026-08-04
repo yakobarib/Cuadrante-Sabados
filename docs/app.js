@@ -190,6 +190,7 @@ function actualizarSalidaJson() {
   const datos = { mes: mesActual, sabados };
   elOutputJson.value = JSON.stringify(datos, null, 2);
   elLinkGithub.href = `${REPO_EDIT_BASE}${mesActual}.json`;
+  elLinkGithub.textContent = `Abrir data/${mesActual}.json en GitHub →`;
 }
 
 elBtnCopiar.addEventListener("click", async () => {
