@@ -56,12 +56,16 @@ h1 { margin: 0 0 0.25rem; font-size: 1.7rem; }
 .subtitle { color: var(--muted); margin: 0; font-size: 1.05rem; }
 
 main {
-  max-width: 760px;
+  max-width: 1180px;
   margin: 0 auto;
   padding: 0.75rem 1.25rem 6rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+.selector-mes, .barra-guardar, .avanzado {
+  max-width: 760px;
 }
 
 .panel {
@@ -129,9 +133,20 @@ button { font: inherit; cursor: pointer; }
 .btn-secundario:hover { border-color: var(--accent); }
 
 .lista-sabados {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+  align-items: start;
+}
+
+/* Mes de 5 sábados: la última tarjeta queda sola en su fila, que ocupe todo el ancho */
+.lista-sabados > .tarjeta:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 700px) {
+  .lista-sabados { grid-template-columns: 1fr; }
+  .lista-sabados > .tarjeta:last-child:nth-child(odd) { grid-column: auto; }
 }
 
 .tarjeta {
