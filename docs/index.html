@@ -14,28 +14,31 @@
 </header>
 
 <main>
-  <section class="panel selector-mes">
-    <label class="campo">
-      <span>Mes</span>
-      <select id="select-mes">
-        <option value="">Cargando meses…</option>
-      </select>
-    </label>
-    <button id="btn-nuevo-mes" type="button" class="btn-secundario">+ Nuevo mes</button>
-    <span id="estado-carga" class="estado-texto"></span>
-  </section>
+  <div class="barra-superior">
+    <section class="panel selector-mes">
+      <label class="campo">
+        <span>Mes</span>
+        <select id="select-mes">
+          <option value="">Cargando meses…</option>
+        </select>
+      </label>
+      <div class="campo">
+        <span class="campo-espaciador" aria-hidden="true">&nbsp;</span>
+        <button id="btn-nuevo-mes" type="button" class="btn-secundario">+ Nuevo mes</button>
+      </div>
+      <span id="estado-carga" class="estado-texto"></span>
+    </section>
 
-  <section id="lista-sabados" class="lista-sabados"></section>
+    <div id="barra-guardar" class="panel caja-guardar" hidden>
+      <button id="btn-guardar" type="button" class="btn-primario">💾 Guardar cambios</button>
+      <span id="estado-guardado" class="estado-texto"></span>
+    </div>
 
-  <div id="barra-guardar" class="barra-guardar" hidden>
-    <button id="btn-guardar" type="button" class="btn-primario">💾 Guardar cambios</button>
-    <span id="estado-guardado" class="estado-texto"></span>
-  </div>
+    <details id="opciones-avanzadas" class="panel avanzado">
+      <summary>⚙️ Opciones avanzadas</summary>
+      <div class="avanzado-contenido">
 
-  <details id="opciones-avanzadas" class="panel avanzado">
-    <summary>⚙️ Opciones avanzadas</summary>
-
-    <div class="bloque-avanzado">
+      <div class="bloque-avanzado">
       <h3>Guardado automático (recomendado)</h3>
       <p>
         Configura una sola vez un token de GitHub para que "Guardar cambios" escriba
@@ -74,7 +77,12 @@
       <textarea id="input-json" rows="6" placeholder='{"mes":"2026-09","sabados":[...]}'></textarea>
       <button id="btn-cargar-json" type="button" class="btn-secundario">Cargar este JSON</button>
     </div>
-  </details>
+
+      </div>
+    </details>
+  </div>
+
+  <section id="lista-sabados" class="lista-sabados"></section>
 </main>
 
 <script type="module" src="app.js"></script>

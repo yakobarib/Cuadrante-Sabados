@@ -29,6 +29,11 @@ const btnCargarJson = el("btn-cargar-json");
 let mesActual = null;
 let sabados = [];
 let shaActual = null; // sha del fichero en GitHub, para poder actualizarlo
+let ultimoGuardadoJson = null; // snapshot del último estado cargado/guardado, para detectar cambios sin guardar
+
+function snapshotActual() {
+  return JSON.stringify({ mes: mesActual, sabados });
+}
 
 function getToken() {
   return localStorage.getItem(TOKEN_KEY) || "";
@@ -106,6 +111,7 @@ async function cargarMes(mes) {
       ausentes: Array.isArray(s.ausentes) ? [...s.ausentes] : [],
     }));
     estadoCarga.textContent = "";
+    ultimoGuardadoJson = snapshotActual();
     render();
   } catch (e) {
     estadoCarga.textContent = `No se pudo cargar ${mes}: ${e.message}`;
@@ -127,6 +133,7 @@ btnNuevoMes.addEventListener("click", () => {
     festivo: false,
     ausentes: [],
   }));
+  ultimoGuardadoJson = null; // mes nuevo: todavía no existe guardado, siempre "sin guardar"
   render();
   estadoCarga.textContent = `Mes ${entrada} creado. Recuerda guardarlo.`;
 });
@@ -183,6 +190,17 @@ function render() {
   });
 
   actualizarSalidaJson();
+  actualizarAvisoSinGuardar();
+}
+
+function actualizarAvisoSinGuardar() {
+  const sinGuardar = !!mesActual && snapshotActual() !== ultimoGuardadoJson;
+  btnGuardar.classList.toggle("parpadeando", sinGuardar);
+  if (sinGuardar && !estadoGuardado.textContent) {
+    estadoGuardado.textContent = "Tienes cambios sin guardar";
+  } else if (!sinGuardar && estadoGuardado.textContent === "Tienes cambios sin guardar") {
+    estadoGuardado.textContent = "";
+  }
 }
 
 function renderTarjeta(sabado) {
@@ -316,6 +334,9 @@ btnCopiar.addEventListener("click", async () => {
     outputJson.select();
     document.execCommand("copy");
   }
+  // Se asume que va a pegarlo en GitHub a continuación: dejamos de avisar de cambios sin guardar.
+  ultimoGuardadoJson = snapshotActual();
+  actualizarAvisoSinGuardar();
 });
 
 btnCargarJson.addEventListener("click", () => {
@@ -329,6 +350,7 @@ btnCargarJson.addEventListener("click", () => {
       festivo: !!s.festivo,
       ausentes: Array.isArray(s.ausentes) ? [...s.ausentes] : [],
     }));
+    ultimoGuardadoJson = snapshotActual();
     render();
   } catch (e) {
     alert("El JSON no es válido: " + e.message);
@@ -371,7 +393,9 @@ btnGuardar.addEventListener("click", async () => {
     }
     const resultado = await resp.json();
     shaActual = resultado.content.sha;
+    ultimoGuardadoJson = snapshotActual();
     estadoGuardado.textContent = "✅ Guardado. Si hay alguna incidencia, te llegará un email en breve.";
+    actualizarAvisoSinGuardar();
     await cargarListaMesesSinRecargar();
   } catch (e) {
     estadoGuardado.textContent = `❌ Error al guardar: ${e.message}`;
