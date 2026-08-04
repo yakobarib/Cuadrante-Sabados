@@ -1,27 +1,39 @@
 :root {
   color-scheme: light dark;
-  --bg: #f5f6f8;
+  --bg: #f2f4f7;
   --panel: #ffffff;
   --text: #1c1f24;
   --muted: #6b7280;
-  --border: #e0e3e8;
+  --border: #e2e5ea;
   --accent: #2563eb;
-  --ok: #16a34a;
-  --minimo: #ca8a04;
-  --incidencia: #dc2626;
+  --accent-text: #ffffff;
+  --ok-bg: #e8f8ee;
+  --ok-text: #15803d;
+  --minimo-bg: #fef9e7;
+  --minimo-text: #92700c;
+  --incidencia-bg: #fdecec;
+  --incidencia-text: #b91c1c;
+  --festivo-bg: #f0f1f3;
+  --festivo-text: #555b66;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #14161a;
-    --panel: #1d2027;
-    --text: #e9eaec;
+    --bg: #121316;
+    --panel: #1c1f24;
+    --text: #edeef0;
     --muted: #9aa1ac;
-    --border: #2b2f37;
+    --border: #2c2f36;
     --accent: #5b8def;
-    --ok: #4ade80;
-    --minimo: #facc15;
-    --incidencia: #f87171;
+    --accent-text: #0b1220;
+    --ok-bg: #123420;
+    --ok-text: #4ade80;
+    --minimo-bg: #3a2f06;
+    --minimo-text: #facc15;
+    --incidencia-bg: #3a1414;
+    --incidencia-text: #f87171;
+    --festivo-bg: #23262c;
+    --festivo-text: #9aa1ac;
   }
 }
 
@@ -32,21 +44,21 @@ body {
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   background: var(--bg);
   color: var(--text);
+  font-size: 16px;
 }
 
 header {
-  padding: 1.5rem 1.25rem 0.5rem;
-  max-width: 900px;
+  max-width: 760px;
   margin: 0 auto;
+  padding: 1.75rem 1.25rem 0.5rem;
 }
-
-h1 { margin-bottom: 0.25rem; }
-.subtitle { color: var(--muted); margin-top: 0; }
+h1 { margin: 0 0 0.25rem; font-size: 1.7rem; }
+.subtitle { color: var(--muted); margin: 0; font-size: 1.05rem; }
 
 main {
-  max-width: 900px;
+  max-width: 760px;
   margin: 0 auto;
-  padding: 0.5rem 1.25rem 3rem;
+  padding: 0.75rem 1.25rem 6rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -55,109 +67,233 @@ main {
 .panel {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.25rem;
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
 }
 
-.fila {
+.selector-mes {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  align-items: end;
+  align-items: center;
+  gap: 0.9rem;
 }
 
-label {
+.campo {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  font-size: 0.9rem;
+  gap: 0.3rem;
+  font-size: 0.85rem;
   color: var(--muted);
+  flex: 1;
+  min-width: 180px;
 }
 
-input, select, button, textarea {
+select, input[type="password"] {
   font: inherit;
-  padding: 0.5rem 0.65rem;
-  border-radius: 8px;
+  font-size: 1.05rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--bg);
   color: var(--text);
 }
 
-button {
-  background: var(--accent);
-  color: white;
+.estado-texto {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+button { font: inherit; cursor: pointer; }
+
+.btn-primario, .btn-secundario {
   border: none;
+  border-radius: 10px;
+  padding: 0.65rem 1.1rem;
+  font-weight: 700;
+}
+
+.btn-primario {
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 1.1rem;
+  padding: 0.85rem 1.5rem;
+}
+.btn-primario:hover { filter: brightness(1.08); }
+.btn-primario:disabled { opacity: 0.6; cursor: default; }
+
+.btn-secundario {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secundario:hover { border-color: var(--accent); }
+
+.lista-sabados {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tarjeta {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 6px solid var(--border);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+}
+.tarjeta.estado-ok { border-left-color: var(--ok-text); }
+.tarjeta.estado-minimo { border-left-color: var(--minimo-text); }
+.tarjeta.estado-incidencia { border-left-color: var(--incidencia-text); }
+.tarjeta.estado-festivo { border-left-color: var(--festivo-text); }
+
+.tarjeta-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.tarjeta-cabecera h2 { margin: 0; font-size: 1.25rem; }
+
+.pill {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.pill-ok { background: var(--ok-bg); color: var(--ok-text); }
+.pill-minimo { background: var(--minimo-bg); color: var(--minimo-text); }
+.pill-incidencia { background: var(--incidencia-bg); color: var(--incidencia-text); }
+.pill-festivo { background: var(--festivo-bg); color: var(--festivo-text); }
+
+.tarjeta-controles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.toggle {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+}
+.toggle.activo {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+  font-weight: 700;
+}
+
+.nota-festivo {
+  color: var(--muted);
+  font-style: italic;
+  margin: 0.5rem 0 0;
+}
+
+.columnas-roles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin: 0.75rem 0;
+}
+@media (max-width: 560px) {
+  .columnas-roles { grid-template-columns: 1fr; }
+}
+
+.columna-personas h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.chip {
+  border: 1.5px solid var(--ok-text);
+  background: var(--ok-bg);
+  color: var(--ok-text);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: transform 0.05s ease;
+}
+.chip:active { transform: scale(0.97); }
+.chip.ausente {
+  border-color: var(--incidencia-text);
+  background: var(--incidencia-bg);
+  color: var(--incidencia-text);
+  text-decoration: line-through;
+}
+
+.resumen {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed var(--border);
+  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.aviso-incidencia {
+  color: var(--incidencia-text);
+  font-weight: 700;
+}
+
+.barra-guardar {
+  position: sticky;
+  bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.85rem 1.25rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.avanzado summary {
   cursor: pointer;
+  color: var(--muted);
   font-weight: 600;
 }
-button:hover { filter: brightness(1.08); }
+
+.bloque-avanzado {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.bloque-avanzado:first-of-type { border-top: none; margin-top: 0.75rem; }
+.bloque-avanzado h3 { margin: 0 0 0.4rem; font-size: 1rem; }
+.bloque-avanzado ol { padding-left: 1.2rem; color: var(--muted); font-size: 0.9rem; }
+
+.fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  margin: 0.5rem 0;
+}
 
 textarea {
   width: 100%;
   font-family: ui-monospace, monospace;
   font-size: 0.85rem;
-  margin-top: 0.5rem;
-}
-
-details { margin-top: 1rem; }
-summary { cursor: pointer; color: var(--muted); }
-
-.tarjeta-sabado {
-  border: 1px solid var(--border);
+  padding: 0.6rem;
   border-radius: 10px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-}
-
-.tarjeta-cabecera {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.tarjeta-cabecera h3 { margin: 0; }
-
-.personas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.25rem;
-  margin: 0.75rem 0;
-}
-
-.persona-check {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
   color: var(--text);
-}
-
-.resultado {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-top: 0.75rem;
-  font-size: 0.9rem;
-}
-
-.resultado strong { display: block; margin-bottom: 0.15rem; }
-
-.badge {
-  display: inline-block;
-  padding: 0.15rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: white;
-}
-.badge.ok { background: var(--ok); }
-.badge.minimo { background: var(--minimo); color: #3a2e00; }
-.badge.incidencia { background: var(--incidencia); }
-.badge.festivo { background: var(--muted); }
-
-.incidencias-lista {
-  color: var(--incidencia);
-  font-weight: 600;
 }

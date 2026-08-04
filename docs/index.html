@@ -8,50 +8,72 @@
 </head>
 <body>
 <header>
-  <h1>Cuadrante Sábados</h1>
-  <p class="subtitle">Calculadora de Teléfonos / Mostrador — solo disponible/ausente, sin motivos.</p>
+  <h1>📅 Cuadrante Sábados</h1>
+  <p class="subtitle">Marca quién falta y la web calcula sola quién cubre Teléfonos y Mostrador.</p>
 </header>
 
 <main>
-  <section class="panel" id="panel-cargar">
-    <h2>1. Elegir mes</h2>
-    <div class="fila">
-      <label>Mes
-        <input type="month" id="input-mes" value="2026-09" />
-      </label>
-      <label>Grupo del primer sábado
-        <select id="input-grupo-inicial">
-          <option value="1">Grupo 1</option>
-          <option value="2">Grupo 2</option>
-        </select>
-      </label>
-      <button id="btn-generar" type="button">Generar sábados en blanco</button>
+  <section class="panel selector-mes">
+    <label class="campo">
+      <span>Mes</span>
+      <select id="select-mes">
+        <option value="">Cargando meses…</option>
+      </select>
+    </label>
+    <button id="btn-nuevo-mes" type="button" class="btn-secundario">+ Nuevo mes</button>
+    <span id="estado-carga" class="estado-texto"></span>
+  </section>
+
+  <section id="lista-sabados" class="lista-sabados"></section>
+
+  <div id="barra-guardar" class="barra-guardar" hidden>
+    <button id="btn-guardar" type="button" class="btn-primario">💾 Guardar cambios</button>
+    <span id="estado-guardado" class="estado-texto"></span>
+  </div>
+
+  <details id="opciones-avanzadas" class="panel avanzado">
+    <summary>⚙️ Opciones avanzadas</summary>
+
+    <div class="bloque-avanzado">
+      <h3>Guardado automático (recomendado)</h3>
+      <p>
+        Configura una sola vez un token de GitHub para que "Guardar cambios" escriba
+        directamente en el repositorio, sin copiar/pegar nada.
+      </p>
+      <div id="token-sin-configurar">
+        <ol>
+          <li>Abre <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">crear token de GitHub</a>.</li>
+          <li>En "Repository access" elige <strong>Only select repositories</strong> → <strong>Cuadrante-Sabados</strong>.</li>
+          <li>En "Permissions" → "Repository permissions" → <strong>Contents</strong> → <strong>Read and write</strong>.</li>
+          <li>Genera el token y pégalo aquí (solo se guarda en este navegador, en ningún otro sitio):</li>
+        </ol>
+        <div class="fila">
+          <input type="password" id="input-token" placeholder="github_pat_..." />
+          <button id="btn-guardar-token" type="button" class="btn-secundario">Guardar token</button>
+        </div>
+      </div>
+      <div id="token-configurado" hidden>
+        <p>✅ Token configurado en este navegador.</p>
+        <button id="btn-borrar-token" type="button" class="btn-secundario">Quitar token</button>
+      </div>
     </div>
 
-    <details>
-      <summary>O pegar el JSON de un mes ya existente (por ejemplo el de <code>data/2026-09.json</code>)</summary>
-      <textarea id="input-json" rows="8" placeholder='{"mes":"2026-09","sabados":[...]}'></textarea>
-      <button id="btn-cargar-json" type="button">Cargar este JSON</button>
-    </details>
-  </section>
-
-  <section class="panel" id="panel-sabados" hidden>
-    <h2>2. Marcar ausencias</h2>
-    <div id="lista-sabados"></div>
-  </section>
-
-  <section class="panel" id="panel-guardar" hidden>
-    <h2>3. Guardar en GitHub</h2>
-    <p>
-      Copia el JSON y pégalo en el editor de GitHub para confirmar el cambio
-      (esto dispara la comprobación automática y el email si hay alguna incidencia).
-    </p>
-    <div class="fila">
-      <button id="btn-copiar" type="button">Copiar JSON del mes</button>
-      <a id="link-github" href="#" target="_blank" rel="noopener">Abrir data/&lt;mes&gt;.json en GitHub →</a>
+    <div class="bloque-avanzado">
+      <h3>Guardado manual (si no usas token)</h3>
+      <p>Copia el JSON y pégalo tú misma en el archivo del mes en GitHub.</p>
+      <div class="fila">
+        <button id="btn-copiar" type="button" class="btn-secundario">Copiar JSON del mes</button>
+        <a id="link-github" href="#" target="_blank" rel="noopener">Abrir en GitHub →</a>
+      </div>
+      <textarea id="output-json" rows="6" readonly></textarea>
     </div>
-    <textarea id="output-json" rows="8" readonly></textarea>
-  </section>
+
+    <div class="bloque-avanzado">
+      <h3>Cargar JSON pegado a mano</h3>
+      <textarea id="input-json" rows="6" placeholder='{"mes":"2026-09","sabados":[...]}'></textarea>
+      <button id="btn-cargar-json" type="button" class="btn-secundario">Cargar este JSON</button>
+    </div>
+  </details>
 </main>
 
 <script type="module" src="app.js"></script>
