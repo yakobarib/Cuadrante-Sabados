@@ -23,11 +23,7 @@
       "fecha": "2026-08-22",
       "grupo": 1,
       "festivo": false,
-      "ausentes": [
-        "Manolo Pérez",
-        "Marcos",
-        "Toni Prats"
-      ]
+      "ausentes": []
     },
     {
       "fecha": "2026-08-29",
