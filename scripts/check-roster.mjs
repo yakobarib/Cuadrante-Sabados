@@ -4,15 +4,21 @@
 //
 // Si se ejecuta dentro de GitHub Actions, escribe en $GITHUB_OUTPUT:
 //   hay_incidencias = "true" | "false"
-//   detalle          = texto con el resumen de incidencias (para el cuerpo del email)
+//   detalle          = texto plano con el resumen de incidencias (fallback del email)
+//   detalle_html     = versión en HTML del mismo resumen, con sugerencia de solución
 
 import { readFile, appendFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { calcularMes } from "../docs/rules.js";
+import { calcularMes, sugerirSolucion } from "../docs/rules.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, "..", "data");
+
+const MESES = [
+  "enero", "febrero", "marzo", "abril", "mayo", "junio",
+  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+];
 
 async function ficherosAComprobar() {
   const args = process.argv.slice(2);
@@ -26,9 +32,74 @@ function formatearFecha(fechaIso) {
   return `${dia}/${mes}/${anio}`;
 }
 
+function formatearFechaLarga(fechaIso) {
+  const [anio, mes, dia] = fechaIso.split("-");
+  return `${Number(dia)} de ${MESES[Number(mes) - 1]} de ${anio}`;
+}
+
+function nombreMesLegible(mesStr) {
+  const [anio, mes] = (mesStr || "").split("-").map(Number);
+  return mes ? `${MESES[mes - 1]} ${anio}` : mesStr;
+}
+
+function escaparHtml(texto) {
+  return String(texto).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+}
+
+function bloqueIncidenciaHtml(r) {
+  const sugerencia = sugerirSolucion(r.resultado);
+  return `
+    <div style="border-left:4px solid #b91c1c;background:#fef5f5;border-radius:6px;padding:14px 18px;margin-bottom:14px;">
+      <div style="font-weight:700;font-size:15px;color:#111827;margin-bottom:6px;">
+        Sábado ${escaparHtml(formatearFechaLarga(r.fecha))} — Grupo ${escaparHtml(r.grupo ?? "-")}
+      </div>
+      <div style="color:#b91c1c;font-weight:600;font-size:13.5px;margin-bottom:10px;">
+        ${escaparHtml(r.resultado.incidencias.join(" · "))}
+      </div>
+      <div style="font-size:14px;color:#333;line-height:1.7;">
+        <div><strong>Teléfonos actuales:</strong> ${escaparHtml(r.resultado.telefonos.join(", ") || "—")}</div>
+        <div><strong>Mostrador actuales:</strong> ${escaparHtml(r.resultado.mostrador.join(", ") || "—")}</div>
+      </div>
+      ${
+        sugerencia
+          ? `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed #e2b8b8;font-size:13.5px;color:#444;line-height:1.6;">
+              💡 <strong>Sugerencia:</strong> ${escaparHtml(sugerencia)}
+             </div>`
+          : ""
+      }
+    </div>`;
+}
+
+function generarHtml(bloquesPorMes) {
+  const cuerpo = bloquesPorMes
+    .map(
+      ({ mes, bloques }) => `
+        <div style="margin-bottom:22px;">
+          <p style="margin:0 0 12px;color:#555;font-size:14px;">Mes: <strong>${escaparHtml(nombreMesLegible(mes))}</strong></p>
+          ${bloques.join("")}
+        </div>`
+    )
+    .join("");
+
+  return `
+  <div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;">
+    <div style="background:#b91c1c;color:#fff;padding:16px 22px;border-radius:8px 8px 0 0;">
+      <h1 style="margin:0;font-size:18px;">⚠️ Incidencia en el cuadrante de sábados</h1>
+    </div>
+    <div style="border:1px solid #eee;border-top:none;padding:22px;border-radius:0 0 8px 8px;">
+      ${cuerpo}
+      <p style="margin-top:8px;font-size:13px;color:#888;line-height:1.6;">
+        Revisa y decide cómo cubrirlo desde
+        <a href="https://yakobarib.github.io/Cuadrante-Sabados/" style="color:#2563eb;">la web del cuadrante</a>.
+      </p>
+    </div>
+  </div>`;
+}
+
 async function main() {
   const ficheros = await ficherosAComprobar();
-  const lineas = [];
+  const lineasTexto = [];
+  const bloquesPorMesHtml = [];
   let hayIncidencias = false;
 
   for (const fichero of ficheros) {
@@ -36,7 +107,7 @@ async function main() {
     try {
       datos = JSON.parse(await readFile(fichero, "utf8"));
     } catch (e) {
-      lineas.push(`⚠️ No se pudo leer/parsear ${fichero}: ${e.message}`);
+      lineasTexto.push(`⚠️ No se pudo leer/parsear ${fichero}: ${e.message}`);
       hayIncidencias = true;
       continue;
     }
@@ -55,26 +126,37 @@ async function main() {
 
     if (conIncidencia.length) {
       hayIncidencias = true;
-      lineas.push(`Mes ${datos.mes || path.basename(fichero)}:`);
+      lineasTexto.push(`Mes ${datos.mes || path.basename(fichero)}:`);
       for (const r of conIncidencia) {
-        lineas.push(
+        lineasTexto.push(
           `  - Sábado ${formatearFecha(r.fecha)} (Grupo ${r.grupo ?? "-"}): ${r.resultado.incidencias.join(" · ")}`
         );
-        lineas.push(
+        lineasTexto.push(
           `    Teléfonos actuales: ${r.resultado.telefonos.join(", ") || "—"} | Mostrador actuales: ${r.resultado.mostrador.join(", ") || "—"}`
         );
+        const sugerencia = sugerirSolucion(r.resultado);
+        if (sugerencia) lineasTexto.push(`    Sugerencia: ${sugerencia}`);
       }
+      bloquesPorMesHtml.push({
+        mes: datos.mes || path.basename(fichero),
+        bloques: conIncidencia.map(bloqueIncidenciaHtml),
+      });
     }
   }
 
   console.log(`\n${hayIncidencias ? "❌ Hay incidencias." : "✅ Sin incidencias."}`);
 
   if (process.env.GITHUB_OUTPUT) {
-    const detalle = lineas.join("\n") || "Sin incidencias.";
+    const detalle = lineasTexto.join("\n") || "Sin incidencias.";
+    const detalleHtml = hayIncidencias
+      ? generarHtml(bloquesPorMesHtml)
+      : "<p>Sin incidencias.</p>";
+
     await appendFile(process.env.GITHUB_OUTPUT, `hay_incidencias=${hayIncidencias}\n`);
-    // Formato multilínea para GITHUB_OUTPUT
     const delimitador = "EOF_DETALLE";
     await appendFile(process.env.GITHUB_OUTPUT, `detalle<<${delimitador}\n${detalle}\n${delimitador}\n`);
+    const delimitadorHtml = "EOF_DETALLE_HTML";
+    await appendFile(process.env.GITHUB_OUTPUT, `detalle_html<<${delimitadorHtml}\n${detalleHtml}\n${delimitadorHtml}\n`);
   }
 }
 

@@ -32,3 +32,4 @@ jobs:
           from: Cuadrante Sábados
           subject: "⚠️ Incidencia en el cuadrante de sábados"
           body: ${{ steps.check.outputs.detalle }}
+          html_body: ${{ steps.check.outputs.detalle_html }}

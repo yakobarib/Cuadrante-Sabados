@@ -73,3 +73,19 @@ export function calcularMes(datosMes) {
     resultado: calcularSabado(sabado),
   }));
 }
+
+// Sugiere una solución en texto para una incidencia ya calculada (o null si no hay incidencia).
+export function sugerirSolucion(resultado) {
+  if (!resultado || !resultado.incidencias?.length) return null;
+
+  if (resultado.telefonos.length < MIN_TELEFONOS) {
+    return "No queda nadie disponible para Teléfonos ni siquiera con los refuerzos habituales. Contacta urgentemente con alguien de Mostrador del otro grupo, aunque no sea su turno — este rol no puede quedar sin cubrir.";
+  }
+
+  const faltan = MIN_MOSTRADOR - resultado.mostrador.length;
+  if (faltan > 0) {
+    return `Faltan ${faltan} persona${faltan > 1 ? "s" : ""} en Mostrador para llegar al mínimo. Valora pedir un sustituto puntual del otro grupo para ese sábado, o comprobar si alguna de las personas ausentes puede cubrir aunque sea parte de la jornada.`;
+  }
+
+  return null;
+}
