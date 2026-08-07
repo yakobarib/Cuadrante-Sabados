@@ -10,10 +10,20 @@
 import { readFile, appendFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { calcularMes, sugerirSolucion } from "../docs/rules.js";
+import { calcularMes, sugerirSolucion, GRUPOS_POR_DEFECTO } from "../docs/rules.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, "..", "data");
+
+async function cargarGrupos() {
+  try {
+    const contenido = await readFile(path.join(DATA_DIR, "plantilla.json"), "utf8");
+    return JSON.parse(contenido).grupos;
+  } catch {
+    console.warn("⚠️ No se pudo leer data/plantilla.json, usando GRUPOS_POR_DEFECTO.");
+    return GRUPOS_POR_DEFECTO;
+  }
+}
 
 const MESES = [
   "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -24,7 +34,9 @@ async function ficherosAComprobar() {
   const args = process.argv.slice(2);
   if (args.length) return args;
   const nombres = await readdir(DATA_DIR);
-  return nombres.filter((n) => n.endsWith(".json")).map((n) => path.join(DATA_DIR, n));
+  return nombres
+    .filter((n) => n.endsWith(".json") && n !== "plantilla.json")
+    .map((n) => path.join(DATA_DIR, n));
 }
 
 function formatearFecha(fechaIso) {
@@ -97,6 +109,7 @@ function generarHtml(bloquesPorMes) {
 }
 
 async function main() {
+  const grupos = await cargarGrupos();
   const ficheros = await ficherosAComprobar();
   const lineasTexto = [];
   const bloquesPorMesHtml = [];
@@ -112,7 +125,7 @@ async function main() {
       continue;
     }
 
-    const resultados = calcularMes(datos);
+    const resultados = calcularMes(datos, grupos);
     const conIncidencia = resultados.filter((r) => r.resultado.estado === "incidencia");
 
     console.log(`\n${datos.mes || path.basename(fichero)}:`);

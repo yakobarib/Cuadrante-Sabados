@@ -105,7 +105,7 @@ main {
   align-self: flex-start;
 }
 
-.avanzado {
+.panel-flotante {
   position: relative;
   flex: 0 0 auto;
 }
@@ -321,18 +321,18 @@ button { font: inherit; cursor: pointer; }
   font-weight: 700;
 }
 
-.avanzado summary {
+.panel-flotante summary {
   cursor: pointer;
   color: var(--muted);
   font-weight: 600;
   white-space: nowrap;
 }
 
-.avanzado-contenido {
+.panel-flotante-contenido {
   display: none;
 }
 
-.avanzado[open] .avanzado-contenido {
+.panel-flotante[open] .panel-flotante-contenido {
   display: block;
   position: absolute;
   top: calc(100% + 0.5rem);
@@ -349,7 +349,7 @@ button { font: inherit; cursor: pointer; }
 }
 
 @media (max-width: 760px) {
-  .avanzado[open] .avanzado-contenido {
+  .panel-flotante[open] .panel-flotante-contenido {
     position: fixed;
     top: auto;
     bottom: 0.75rem;
@@ -374,6 +374,142 @@ button { font: inherit; cursor: pointer; }
   gap: 0.6rem;
   align-items: center;
   margin: 0.5rem 0;
+}
+
+/* ---------- Panel de Personal ---------- */
+
+.bloque-personal {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.bloque-personal:first-of-type { border-top: none; margin-top: 0; }
+.bloque-personal h3 { margin: 0 0 0.5rem; }
+
+.fila-personal-rol {
+  margin-bottom: 0.75rem;
+}
+.fila-personal-rol > strong {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.chips-editable {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.chip-editable {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.25rem 0.5rem 0.25rem 0.75rem;
+  font-size: 0.85rem;
+}
+.chip-editable button {
+  border: none;
+  background: none;
+  color: var(--incidencia-text, #b91c1c);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0 0.2rem;
+}
+
+.fila-anadir-persona {
+  display: flex;
+  gap: 0.4rem;
+}
+.fila-anadir-persona input {
+  flex: 1;
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.orden-refuerzo {
+  margin: 0;
+  padding-left: 1.3rem;
+  font-size: 0.9rem;
+}
+.orden-refuerzo li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.25rem;
+}
+.orden-refuerzo li span { flex: 1; }
+.orden-refuerzo li button {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 6px;
+  width: 1.6rem;
+  height: 1.6rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+.orden-refuerzo li button:disabled { opacity: 0.35; cursor: default; }
+
+/* ---------- Sustitución Manual ---------- */
+
+.bloque-sustituciones {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.linea-sustitucion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+.btn-quitar-sustitucion {
+  border: none;
+  background: none;
+  color: var(--incidencia-text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-sustitucion-manual {
+  align-self: flex-start;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+}
+
+.form-sustitucion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+.form-sustitucion select {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.5rem;
 }
 
 textarea {

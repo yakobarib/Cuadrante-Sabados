@@ -1,4 +1,4 @@
-import { GRUPOS, calcularSabado } from "./rules.js";
+import { GRUPOS_POR_DEFECTO, calcularSabado, personasDeGrupos } from "./rules.js";
 
 const OWNER = "yakobarib";
 const REPO = "Cuadrante-Sabados";
@@ -27,14 +27,79 @@ const inputJson = el("input-json");
 const btnCargarJson = el("btn-cargar-json");
 const btnImprimir = el("btn-imprimir");
 const hojaImpresion = el("hoja-impresion");
+const personalRender = el("personal-render");
+const btnGuardarPersonal = el("btn-guardar-personal");
+const estadoPersonal = el("estado-personal");
 
 let mesActual = null;
 let sabados = [];
-let shaActual = null; // sha del fichero en GitHub, para poder actualizarlo
-let ultimoGuardadoJson = null; // snapshot del último estado cargado/guardado, para detectar cambios sin guardar
+let shaActual = null; // sha del fichero de mes en GitHub, para poder actualizarlo
+let ultimoGuardadoJson = null; // snapshot del último estado de mes cargado/guardado
+
+let grupos = GRUPOS_POR_DEFECTO;
+let shaPlantilla = null;
+let ultimoGuardadoPlantillaJson = null;
+
+// Sábados con el mini-formulario de "Sustitución Manual" abierto (estado de interfaz, no se guarda).
+const formulariosSustitucionAbiertos = new Set();
 
 function snapshotActual() {
   return JSON.stringify({ mes: mesActual, sabados });
+}
+
+// ---------- Codificación base64 segura con UTF-8 (nombres con tilde, ñ, etc.) ----------
+
+function base64AUtf8(b64) {
+  const binario = atob(b64);
+  const bytes = Uint8Array.from(binario, (c) => c.charCodeAt(0));
+  return new TextDecoder("utf-8").decode(bytes);
+}
+
+function utf8ABase64(texto) {
+  const bytes = new TextEncoder().encode(texto);
+  let binario = "";
+  bytes.forEach((b) => (binario += String.fromCharCode(b)));
+  return btoa(binario);
+}
+
+// ---------- Lectura/escritura genérica de ficheros en data/ vía GitHub ----------
+
+// Reintenta una vez tras un fallo de red (conexión lenta/inestable) antes de rendirse.
+async function fetchConReintento(url, opciones) {
+  try {
+    return await fetch(url, opciones);
+  } catch (e) {
+    await new Promise((r) => setTimeout(r, 700));
+    return fetch(url, opciones);
+  }
+}
+
+async function leerArchivoJson(nombreArchivo) {
+  const resp = await fetchConReintento(`${API_BASE}/${nombreArchivo}`);
+  if (!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
+  const meta = await resp.json();
+  const datos = JSON.parse(base64AUtf8(meta.content));
+  return { datos, sha: meta.sha };
+}
+
+async function guardarArchivo(nombreArchivo, datos, sha, mensaje) {
+  const token = getToken();
+  if (!token) throw new Error("sin-token");
+  const contenido = utf8ABase64(JSON.stringify(datos, null, 2));
+  const resp = await fetch(`${API_BASE}/${nombreArchivo}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+    },
+    body: JSON.stringify({ message: mensaje, content: contenido, sha: sha || undefined }),
+  });
+  if (!resp.ok) {
+    const detalle = await resp.json().catch(() => ({}));
+    throw new Error(detalle.message || `GitHub respondió ${resp.status}`);
+  }
+  const resultado = await resp.json();
+  return resultado.content.sha;
 }
 
 function getToken() {
@@ -60,15 +125,196 @@ btnBorrarToken.addEventListener("click", () => {
   actualizarEstadoToken();
 });
 
+// ---------- Plantilla de personal ----------
+
+async function cargarPlantilla() {
+  try {
+    const { datos, sha } = await leerArchivoJson("plantilla.json");
+    grupos = datos.grupos;
+    shaPlantilla = sha;
+  } catch (e) {
+    grupos = GRUPOS_POR_DEFECTO;
+    shaPlantilla = null;
+    console.warn("No se pudo cargar plantilla.json, usando valores por defecto.", e);
+  }
+  ultimoGuardadoPlantillaJson = JSON.stringify(grupos);
+  renderPersonal();
+}
+
+function actualizarAvisoSinGuardarPersonal() {
+  const sinGuardar = JSON.stringify(grupos) !== ultimoGuardadoPlantillaJson;
+  btnGuardarPersonal.classList.toggle("parpadeando", sinGuardar);
+}
+
+function renderPersonal() {
+  personalRender.innerHTML = "";
+  [1, 2].forEach((numGrupo) => {
+    const g = grupos[numGrupo];
+    if (!g) return;
+
+    const bloque = document.createElement("div");
+    bloque.className = "bloque-personal";
+    bloque.innerHTML = `<h3>Grupo ${numGrupo}</h3>`;
+
+    bloque.appendChild(
+      renderListaEditable(`Teléfonos`, g.telefonos, {
+        onAñadir: (nombre) => {
+          if (!g.telefonos.includes(nombre)) g.telefonos.push(nombre);
+        },
+        onQuitar: (nombre) => {
+          g.telefonos = g.telefonos.filter((p) => p !== nombre);
+        },
+      })
+    );
+
+    bloque.appendChild(
+      renderListaEditable(`Mostrador`, g.mostrador, {
+        onAñadir: (nombre) => {
+          if (!g.mostrador.includes(nombre)) g.mostrador.push(nombre);
+          if (!g.refuerzoTelefonos.includes(nombre)) g.refuerzoTelefonos.push(nombre);
+        },
+        onQuitar: (nombre) => {
+          g.mostrador = g.mostrador.filter((p) => p !== nombre);
+          g.refuerzoTelefonos = g.refuerzoTelefonos.filter((p) => p !== nombre);
+        },
+      })
+    );
+
+    bloque.appendChild(renderOrdenRefuerzo(g));
+
+    personalRender.appendChild(bloque);
+  });
+
+  actualizarAvisoSinGuardarPersonal();
+  render(); // los cálculos de los sábados dependen de `grupos`
+}
+
+function renderListaEditable(titulo, personas, { onAñadir, onQuitar }) {
+  const contenedor = document.createElement("div");
+  contenedor.className = "fila-personal-rol";
+
+  const etiqueta = document.createElement("strong");
+  etiqueta.textContent = titulo;
+  contenedor.appendChild(etiqueta);
+
+  const chips = document.createElement("div");
+  chips.className = "chips-editable";
+  personas.forEach((persona) => {
+    const chip = document.createElement("span");
+    chip.className = "chip-editable";
+    chip.innerHTML = `${persona} <button type="button" aria-label="Quitar">✕</button>`;
+    chip.querySelector("button").addEventListener("click", () => {
+      onQuitar(persona);
+      renderPersonal();
+    });
+    chips.appendChild(chip);
+  });
+  contenedor.appendChild(chips);
+
+  const filaAñadir = document.createElement("div");
+  filaAñadir.className = "fila-anadir-persona";
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = "Nombre nuevo…";
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "btn-secundario";
+  btn.textContent = "+ Añadir";
+  const añadir = () => {
+    const nombre = input.value.trim();
+    if (!nombre) return;
+    onAñadir(nombre);
+    input.value = "";
+    renderPersonal();
+  };
+  btn.addEventListener("click", añadir);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") añadir();
+  });
+  filaAñadir.append(input, btn);
+  contenedor.appendChild(filaAñadir);
+
+  return contenedor;
+}
+
+function renderOrdenRefuerzo(g) {
+  const contenedor = document.createElement("div");
+  contenedor.className = "fila-personal-rol";
+  contenedor.innerHTML = `<strong>Orden de refuerzo a Teléfonos</strong>`;
+
+  const lista = document.createElement("ol");
+  lista.className = "orden-refuerzo";
+  g.refuerzoTelefonos.forEach((persona, idx) => {
+    const li = document.createElement("li");
+    const span = document.createElement("span");
+    span.textContent = persona;
+    li.appendChild(span);
+
+    const btnArriba = document.createElement("button");
+    btnArriba.type = "button";
+    btnArriba.textContent = "↑";
+    btnArriba.disabled = idx === 0;
+    btnArriba.addEventListener("click", () => {
+      [g.refuerzoTelefonos[idx - 1], g.refuerzoTelefonos[idx]] = [
+        g.refuerzoTelefonos[idx],
+        g.refuerzoTelefonos[idx - 1],
+      ];
+      renderPersonal();
+    });
+
+    const btnAbajo = document.createElement("button");
+    btnAbajo.type = "button";
+    btnAbajo.textContent = "↓";
+    btnAbajo.disabled = idx === g.refuerzoTelefonos.length - 1;
+    btnAbajo.addEventListener("click", () => {
+      [g.refuerzoTelefonos[idx + 1], g.refuerzoTelefonos[idx]] = [
+        g.refuerzoTelefonos[idx],
+        g.refuerzoTelefonos[idx + 1],
+      ];
+      renderPersonal();
+    });
+
+    li.append(btnArriba, btnAbajo);
+    lista.appendChild(li);
+  });
+  contenedor.appendChild(lista);
+
+  return contenedor;
+}
+
+btnGuardarPersonal.addEventListener("click", async () => {
+  btnGuardarPersonal.disabled = true;
+  estadoPersonal.textContent = "Guardando…";
+  try {
+    const nuevoSha = await guardarArchivo(
+      "plantilla.json",
+      { grupos },
+      shaPlantilla,
+      "Actualizar personal (grupos, roles y orden de refuerzo)"
+    );
+    shaPlantilla = nuevoSha;
+    ultimoGuardadoPlantillaJson = JSON.stringify(grupos);
+    estadoPersonal.textContent = "✅ Personal guardado.";
+    actualizarAvisoSinGuardarPersonal();
+  } catch (e) {
+    estadoPersonal.textContent =
+      e.message === "sin-token"
+        ? "Configura antes el token en Opciones avanzadas para poder guardar."
+        : `❌ Error al guardar: ${e.message}`;
+  } finally {
+    btnGuardarPersonal.disabled = false;
+  }
+});
+
 // ---------- Cargar lista de meses disponibles ----------
 
 async function cargarListaMeses() {
   try {
-    const resp = await fetch(API_BASE);
+    const resp = await fetchConReintento(API_BASE);
     if (!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
     const archivos = await resp.json();
     const meses = archivos
-      .filter((f) => f.name.endsWith(".json"))
+      .filter((f) => f.name.endsWith(".json") && f.name !== "plantilla.json")
       .map((f) => f.name.replace(".json", ""))
       .sort();
 
@@ -97,21 +343,23 @@ selectMes.addEventListener("change", () => {
   if (selectMes.value) cargarMes(selectMes.value);
 });
 
+function normalizarSabado(s) {
+  return {
+    fecha: s.fecha,
+    grupo: s.grupo ?? null,
+    festivo: !!s.festivo,
+    ausentes: Array.isArray(s.ausentes) ? [...s.ausentes] : [],
+    sustituciones: Array.isArray(s.sustituciones) ? s.sustituciones.map((x) => ({ ...x })) : [],
+  };
+}
+
 async function cargarMes(mes) {
   estadoCarga.textContent = "Cargando…";
   try {
-    const resp = await fetch(`${API_BASE}/${mes}.json`);
-    if (!resp.ok) throw new Error(`GitHub respondió ${resp.status}`);
-    const meta = await resp.json();
-    shaActual = meta.sha;
-    const datos = JSON.parse(atob(meta.content));
+    const { datos, sha } = await leerArchivoJson(`${mes}.json`);
+    shaActual = sha;
     mesActual = datos.mes || mes;
-    sabados = (datos.sabados || []).map((s) => ({
-      fecha: s.fecha,
-      grupo: s.grupo ?? null,
-      festivo: !!s.festivo,
-      ausentes: Array.isArray(s.ausentes) ? [...s.ausentes] : [],
-    }));
+    sabados = (datos.sabados || []).map(normalizarSabado);
     estadoCarga.textContent = "";
     ultimoGuardadoJson = snapshotActual();
     render();
@@ -134,6 +382,7 @@ btnNuevoMes.addEventListener("click", () => {
     grupo: i % 2 === 0 ? grupoInicial : grupoInicial === 1 ? 2 : 1,
     festivo: false,
     ausentes: [],
+    sustituciones: [],
   }));
   ultimoGuardadoJson = null; // mes nuevo: todavía no existe guardado, siempre "sin guardar"
   render();
@@ -206,7 +455,7 @@ function actualizarAvisoSinGuardar() {
 }
 
 function renderTarjeta(sabado) {
-  const resultado = calcularSabado(sabado);
+  const resultado = calcularSabado(sabado, grupos);
 
   const tarjeta = document.createElement("article");
   tarjeta.className = `tarjeta estado-${resultado.estado}`;
@@ -240,6 +489,7 @@ function renderTarjeta(sabado) {
     btnGrupo.addEventListener("click", () => {
       sabado.grupo = g;
       sabado.ausentes = [];
+      sabado.sustituciones = [];
       render();
     });
     controles.appendChild(btnGrupo);
@@ -263,12 +513,14 @@ function renderTarjeta(sabado) {
     return tarjeta;
   }
 
-  const g = GRUPOS[sabado.grupo];
+  const g = grupos[sabado.grupo];
   const columnas = document.createElement("div");
   columnas.className = "columnas-roles";
   columnas.appendChild(renderColumnaPersonas("☎ Teléfonos", g.telefonos, sabado));
   columnas.appendChild(renderColumnaPersonas("🧾 Mostrador", g.mostrador, sabado));
   tarjeta.appendChild(columnas);
+
+  tarjeta.appendChild(renderBloqueSustituciones(sabado, g));
 
   const resumen = document.createElement("div");
   resumen.className = "resumen";
@@ -317,6 +569,110 @@ function renderColumnaPersonas(titulo, personas, sabado) {
   return columna;
 }
 
+// ---------- Sustitución Manual ----------
+
+const ETIQUETA_ROL = { telefonos: "Teléfonos", mostrador: "Mostrador" };
+
+function renderBloqueSustituciones(sabado, g) {
+  const bloque = document.createElement("div");
+  bloque.className = "bloque-sustituciones";
+
+  (sabado.sustituciones || []).forEach((s, idx) => {
+    const linea = document.createElement("div");
+    linea.className = "linea-sustitucion";
+    const texto = document.createElement("span");
+    texto.textContent = `🔄 ${s.sustituto} sustituye a ${s.sustituido} (${ETIQUETA_ROL[s.rol] || s.rol})`;
+    const btnQuitar = document.createElement("button");
+    btnQuitar.type = "button";
+    btnQuitar.className = "btn-quitar-sustitucion";
+    btnQuitar.textContent = "✕";
+    btnQuitar.title = "Quitar esta sustitución (no desmarca la ausencia)";
+    btnQuitar.addEventListener("click", () => {
+      sabado.sustituciones.splice(idx, 1);
+      render();
+    });
+    linea.append(texto, btnQuitar);
+    bloque.appendChild(linea);
+  });
+
+  const abierto = formulariosSustitucionAbiertos.has(sabado.fecha);
+
+  if (!abierto) {
+    const btnAbrir = document.createElement("button");
+    btnAbrir.type = "button";
+    btnAbrir.className = "btn-secundario btn-sustitucion-manual";
+    btnAbrir.textContent = "+ Sustitución Manual";
+    btnAbrir.addEventListener("click", () => {
+      formulariosSustitucionAbiertos.add(sabado.fecha);
+      render();
+    });
+    bloque.appendChild(btnAbrir);
+    return bloque;
+  }
+
+  const personasDelDia = [...g.telefonos, ...g.mostrador];
+  const todoElPersonal = personasDeGrupos(grupos);
+
+  const form = document.createElement("div");
+  form.className = "form-sustitucion";
+
+  const selectSustituido = document.createElement("select");
+  personasDelDia.forEach((p) => {
+    const opt = document.createElement("option");
+    opt.value = p;
+    opt.textContent = p;
+    selectSustituido.appendChild(opt);
+  });
+
+  const selectSustituto = document.createElement("select");
+  todoElPersonal.forEach((p) => {
+    const opt = document.createElement("option");
+    opt.value = p;
+    opt.textContent = p;
+    selectSustituto.appendChild(opt);
+  });
+
+  const campoSustituido = document.createElement("label");
+  campoSustituido.className = "campo";
+  campoSustituido.innerHTML = "<span>Sustituye a</span>";
+  campoSustituido.appendChild(selectSustituido);
+
+  const campoSustituto = document.createElement("label");
+  campoSustituto.className = "campo";
+  campoSustituto.innerHTML = "<span>Sustituto</span>";
+  campoSustituto.appendChild(selectSustituto);
+
+  const btnConfirmar = document.createElement("button");
+  btnConfirmar.type = "button";
+  btnConfirmar.className = "btn-primario";
+  btnConfirmar.textContent = "Añadir";
+  btnConfirmar.addEventListener("click", () => {
+    const sustituido = selectSustituido.value;
+    const sustituto = selectSustituto.value;
+    if (!sustituido || !sustituto) return;
+    const rol = g.telefonos.includes(sustituido) ? "telefonos" : "mostrador";
+    if (!Array.isArray(sabado.sustituciones)) sabado.sustituciones = [];
+    sabado.sustituciones.push({ sustituto, sustituido, rol });
+    if (!sabado.ausentes.includes(sustituido)) sabado.ausentes.push(sustituido);
+    formulariosSustitucionAbiertos.delete(sabado.fecha);
+    render();
+  });
+
+  const btnCancelar = document.createElement("button");
+  btnCancelar.type = "button";
+  btnCancelar.className = "btn-secundario";
+  btnCancelar.textContent = "Cancelar";
+  btnCancelar.addEventListener("click", () => {
+    formulariosSustitucionAbiertos.delete(sabado.fecha);
+    render();
+  });
+
+  form.append(campoSustituido, campoSustituto, btnConfirmar, btnCancelar);
+  bloque.appendChild(form);
+
+  return bloque;
+}
+
 function actualizarSalidaJson() {
   if (!mesActual) return;
   const datos = { mes: mesActual, sabados };
@@ -344,12 +700,7 @@ btnCargarJson.addEventListener("click", () => {
     const datos = JSON.parse(inputJson.value);
     mesActual = datos.mes;
     shaActual = null;
-    sabados = (datos.sabados || []).map((s) => ({
-      fecha: s.fecha,
-      grupo: s.grupo ?? null,
-      festivo: !!s.festivo,
-      ausentes: Array.isArray(s.ausentes) ? [...s.ausentes] : [],
-    }));
+    sabados = (datos.sabados || []).map(normalizarSabado);
     ultimoGuardadoJson = snapshotActual();
     render();
   } catch (e) {
@@ -358,11 +709,6 @@ btnCargarJson.addEventListener("click", () => {
 });
 
 // ---------- Impresión (A4) ----------
-
-function formatearFechaDDMM(fechaIso) {
-  const [, mes, dia] = fechaIso.split("-");
-  return `${dia}/${mes}`;
-}
 
 function formatearFechaLarga(fechaIso) {
   const [, mes, dia] = fechaIso.split("-");
@@ -374,7 +720,7 @@ function formatearFechaLarga(fechaIso) {
 }
 
 function renderBloqueImpresion(sabado, numero) {
-  const resultado = calcularSabado(sabado);
+  const resultado = calcularSabado(sabado, grupos);
 
   if (resultado.festivo) {
     const grupoTexto = sabado.grupo ? ` Grupo ${sabado.grupo}` : "";
@@ -423,11 +769,10 @@ btnImprimir.addEventListener("click", () => {
   window.print();
 });
 
-// ---------- Guardado ----------
+// ---------- Guardado del mes ----------
 
 btnGuardar.addEventListener("click", async () => {
-  const token = getToken();
-  if (!token) {
+  if (!getToken()) {
     estadoGuardado.textContent = "";
     document.getElementById("opciones-avanzadas").open = true;
     alert(
@@ -440,25 +785,13 @@ btnGuardar.addEventListener("click", async () => {
   estadoGuardado.textContent = "Guardando…";
   try {
     const datos = { mes: mesActual, sabados };
-    const contenido = btoa(unescape(encodeURIComponent(JSON.stringify(datos, null, 2))));
-    const resp = await fetch(`${API_BASE}/${mesActual}.json`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github+json",
-      },
-      body: JSON.stringify({
-        message: `Actualizar cuadrante de ${mesActual}`,
-        content: contenido,
-        sha: shaActual || undefined,
-      }),
-    });
-    if (!resp.ok) {
-      const detalle = await resp.json().catch(() => ({}));
-      throw new Error(detalle.message || `GitHub respondió ${resp.status}`);
-    }
-    const resultado = await resp.json();
-    shaActual = resultado.content.sha;
+    const nuevoSha = await guardarArchivo(
+      `${mesActual}.json`,
+      datos,
+      shaActual,
+      `Actualizar cuadrante de ${mesActual}`
+    );
+    shaActual = nuevoSha;
     ultimoGuardadoJson = snapshotActual();
     estadoGuardado.textContent = "✅ Guardado. Si hay alguna incidencia, te llegará un email en breve.";
     actualizarAvisoSinGuardar();
@@ -472,10 +805,13 @@ btnGuardar.addEventListener("click", async () => {
 
 async function cargarListaMesesSinRecargar() {
   try {
-    const resp = await fetch(API_BASE);
+    const resp = await fetchConReintento(API_BASE);
     if (!resp.ok) return;
     const archivos = await resp.json();
-    const meses = archivos.filter((f) => f.name.endsWith(".json")).map((f) => f.name.replace(".json", "")).sort();
+    const meses = archivos
+      .filter((f) => f.name.endsWith(".json") && f.name !== "plantilla.json")
+      .map((f) => f.name.replace(".json", ""))
+      .sort();
     const valorPrevio = selectMes.value;
     selectMes.innerHTML = "";
     meses.forEach((mes) => {
@@ -493,4 +829,4 @@ async function cargarListaMesesSinRecargar() {
 // ---------- Arranque ----------
 
 actualizarEstadoToken();
-cargarListaMeses();
+cargarPlantilla().then(cargarListaMeses);

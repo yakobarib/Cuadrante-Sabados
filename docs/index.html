@@ -35,9 +35,19 @@
     </div>
 
     <div class="columna-derecha">
-    <details id="opciones-avanzadas" class="panel avanzado">
+    <details id="panel-personal" class="panel panel-flotante">
+      <summary>👥 Personal</summary>
+      <div class="panel-flotante-contenido">
+        <div id="personal-render"></div>
+        <div class="fila" style="margin-top: 12px;">
+          <button id="btn-guardar-personal" type="button" class="btn-primario">💾 Guardar cambios de personal</button>
+        </div>
+        <span id="estado-personal" class="estado-texto"></span>
+      </div>
+    </details>
+    <details id="opciones-avanzadas" class="panel panel-flotante">
       <summary>⚙️ Opciones avanzadas</summary>
-      <div class="avanzado-contenido">
+      <div class="panel-flotante-contenido">
 
       <div class="bloque-avanzado">
       <h3>Guardado automático (recomendado)</h3>
