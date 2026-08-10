@@ -273,14 +273,8 @@ button { font: inherit; cursor: pointer; }
   align-items: start;
 }
 
-/* Mes de 5 sábados: la última tarjeta queda sola en su fila, que ocupe todo el ancho */
-.lista-sabados > .tarjeta:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
-}
-
 @media (max-width: 700px) {
   .lista-sabados { grid-template-columns: 1fr; }
-  .lista-sabados > .tarjeta:last-child:nth-child(odd) { grid-column: auto; }
 }
 
 /* Pantallas anchas: aprovechar el ancho en vez de dejarlo vacío a los lados */
