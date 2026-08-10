@@ -37,6 +37,43 @@
   }
 }
 
+/* Elección manual de tema (botón ☀️/🌙), gana siempre sobre la preferencia del sistema */
+:root[data-theme="dark"] {
+  --bg: #121316;
+  --panel: #1c1f24;
+  --text: #edeef0;
+  --muted: #9aa1ac;
+  --border: #2c2f36;
+  --accent: #5b8def;
+  --accent-text: #0b1220;
+  --ok-bg: #123420;
+  --ok-text: #4ade80;
+  --minimo-bg: #3a2f06;
+  --minimo-text: #facc15;
+  --incidencia-bg: #3a1414;
+  --incidencia-text: #f87171;
+  --festivo-bg: #23262c;
+  --festivo-text: #9aa1ac;
+}
+
+:root[data-theme="light"] {
+  --bg: #f2f4f7;
+  --panel: #ffffff;
+  --text: #1c1f24;
+  --muted: #6b7280;
+  --border: #e2e5ea;
+  --accent: #2563eb;
+  --accent-text: #ffffff;
+  --ok-bg: #e8f8ee;
+  --ok-text: #15803d;
+  --minimo-bg: #fef9e7;
+  --minimo-text: #92700c;
+  --incidencia-bg: #fdecec;
+  --incidencia-text: #b91c1c;
+  --festivo-bg: #f0f1f3;
+  --festivo-text: #555b66;
+}
+
 * { box-sizing: border-box; }
 
 body {
@@ -54,6 +91,35 @@ header {
 }
 h1 { margin: 0 0 0.15rem; font-size: 1.45rem; }
 .subtitle { color: var(--muted); margin: 0; font-size: 0.95rem; }
+
+.cabecera-fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.barra-iconos {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.btn-icono {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+.btn-icono:hover { border-color: var(--accent); }
 
 main {
   max-width: 1180px;
@@ -178,11 +244,11 @@ button { font: inherit; cursor: pointer; }
 .btn-secundario:hover { border-color: var(--accent); }
 
 .btn-primario:focus, .btn-secundario:focus,
-.toggle:focus, .chip:focus {
+.toggle:focus, .chip:focus, .btn-icono:focus {
   outline: none;
 }
 .btn-primario:focus-visible, .btn-secundario:focus-visible,
-.toggle:focus-visible, .chip:focus-visible {
+.toggle:focus-visible, .chip:focus-visible, .btn-icono:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -358,6 +424,33 @@ button { font: inherit; cursor: pointer; }
     width: auto;
   }
 }
+
+/* ---------- Modales (Ayuda / Ajustes / Login) ---------- */
+
+.modal {
+  width: min(520px, 90vw);
+  max-height: 80vh;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+.modal h2 { margin: 0 0 1rem; font-size: 1.2rem; }
+.modal-contenido {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.modal-contenido p { margin: 0; }
 
 .bloque-avanzado {
   margin-top: 1rem;

@@ -30,6 +30,13 @@ const hojaImpresion = el("hoja-impresion");
 const personalRender = el("personal-render");
 const btnGuardarPersonal = el("btn-guardar-personal");
 const estadoPersonal = el("estado-personal");
+const btnTema = el("btn-tema");
+const btnAyuda = el("btn-ayuda");
+const btnAjustes = el("btn-ajustes");
+const btnLogin = el("btn-login");
+const modalAyuda = el("modal-ayuda");
+const modalAjustes = el("modal-ajustes");
+const modalLogin = el("modal-login");
 
 let mesActual = null;
 let sabados = [];
@@ -123,6 +130,50 @@ btnGuardarToken.addEventListener("click", () => {
 btnBorrarToken.addEventListener("click", () => {
   localStorage.removeItem(TOKEN_KEY);
   actualizarEstadoToken();
+});
+
+// ---------- Tema claro/oscuro ----------
+
+const TEMA_KEY = "cuadrante_sabados_tema";
+
+function aplicarTema(tema) {
+  document.documentElement.setAttribute("data-theme", tema);
+  btnTema.textContent = tema === "dark" ? "🌙" : "☀️";
+  localStorage.setItem(TEMA_KEY, tema);
+}
+
+function iniciarTema() {
+  const guardado = localStorage.getItem(TEMA_KEY);
+  if (guardado === "dark" || guardado === "light") {
+    aplicarTema(guardado);
+  } else {
+    const prefiereOscuro = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    btnTema.textContent = prefiereOscuro ? "🌙" : "☀️";
+  }
+}
+
+btnTema.addEventListener("click", () => {
+  const actual =
+    document.documentElement.getAttribute("data-theme") ||
+    (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  aplicarTema(actual === "dark" ? "light" : "dark");
+});
+
+// ---------- Modales (Ayuda / Ajustes / Login) ----------
+
+btnAyuda.addEventListener("click", () => modalAyuda.showModal());
+btnAjustes.addEventListener("click", () => modalAjustes.showModal());
+btnLogin.addEventListener("click", () => modalLogin.showModal());
+
+document.querySelectorAll(".cerrar-modal").forEach((boton) => {
+  boton.addEventListener("click", () => boton.closest("dialog").close());
+});
+
+// Cerrar el modal al pulsar fuera de él (en el <dialog>, el click "fuera" cae sobre el propio elemento)
+document.querySelectorAll("dialog.modal").forEach((dialogo) => {
+  dialogo.addEventListener("click", (e) => {
+    if (e.target === dialogo) dialogo.close();
+  });
 });
 
 // ---------- Plantilla de personal ----------
@@ -828,5 +879,6 @@ async function cargarListaMesesSinRecargar() {
 
 // ---------- Arranque ----------
 
+iniciarTema();
 actualizarEstadoToken();
 cargarPlantilla().then(cargarListaMeses);
