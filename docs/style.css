@@ -113,6 +113,8 @@ h1 { margin: 0 0 0.15rem; font-size: 1.45rem; }
 .pie-pagina p { margin: 0; }
 .pie-pagina strong { color: var(--text); }
 .pie-pagina .version { margin-top: 0.35rem; font-size: 0.8rem; opacity: 0.7; }
+.pie-pagina .version a { color: inherit; text-decoration: none; }
+.pie-pagina .version a:hover { text-decoration: underline; }
 
 .cabecera-fila {
   display: flex;
@@ -126,6 +128,11 @@ h1 { margin: 0 0 0.15rem; font-size: 1.45rem; }
   display: flex;
   gap: 0.5rem;
   flex-shrink: 0;
+}
+
+.btn-icono svg {
+  width: 20px;
+  height: 20px;
 }
 
 .btn-icono {
@@ -536,6 +543,24 @@ button { font: inherit; cursor: pointer; }
 .bloque-avanzado:first-of-type { border-top: none; margin-top: 0.75rem; }
 .bloque-avanzado h3 { margin: 0 0 0.4rem; font-size: 1rem; }
 .bloque-avanzado ol { padding-left: 1.2rem; color: var(--muted); font-size: 0.9rem; }
+
+.intro-guardado {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem;
+}
+
+.pasos-guardado li {
+  margin-bottom: 0.4rem;
+  line-height: 1.5;
+}
+.pasos-guardado code {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.05rem 0.3rem;
+  font-size: 0.85em;
+}
 
 .fila {
   display: flex;
