@@ -868,7 +868,7 @@ btnGuardar.addEventListener("click", async () => {
     estadoGuardado.textContent = "";
     modalAjustes.showModal();
     alert(
-      'No tienes guardado automático configurado. Usa "Copiar JSON del mes" y pégalo en GitHub (sección "Guardado manual" abajo), o configura el token en "Guardado automático".'
+      'Esto no se ha guardado todavía. Usa la Opción A (copiar el JSON y pegarlo en GitHub) aquí abajo, o configura la Opción B para guardar con un clic a partir de ahora.'
     );
     return;
   }
