@@ -12,7 +12,6 @@ const selectMes = el("select-mes");
 const btnNuevoMes = el("btn-nuevo-mes");
 const estadoCarga = el("estado-carga");
 const listaSabados = el("lista-sabados");
-const barraGuardar = el("barra-guardar");
 const btnGuardar = el("btn-guardar");
 const estadoGuardado = el("estado-guardado");
 const inputToken = el("input-token");
@@ -215,6 +214,7 @@ function renderPersonal() {
         onQuitar: (nombre) => {
           g.telefonos = g.telefonos.filter((p) => p !== nombre);
         },
+        onRenombrar: (viejo, nuevo) => renombrarPersona(g, viejo, nuevo),
       })
     );
 
@@ -228,6 +228,7 @@ function renderPersonal() {
           g.mostrador = g.mostrador.filter((p) => p !== nombre);
           g.refuerzoTelefonos = g.refuerzoTelefonos.filter((p) => p !== nombre);
         },
+        onRenombrar: (viejo, nuevo) => renombrarPersona(g, viejo, nuevo),
       })
     );
 
@@ -240,7 +241,26 @@ function renderPersonal() {
   render(); // los cálculos de los sábados dependen de `grupos`
 }
 
-function renderListaEditable(titulo, personas, { onAñadir, onQuitar }) {
+// Cambia el nombre de una persona en todas las listas de su grupo (telefonos,
+// mostrador, orden de refuerzo) y en el mes actualmente cargado (ausentes,
+// sustituciones), para que no queden referencias sueltas al nombre antiguo.
+function renombrarPersona(g, viejo, nuevo) {
+  const reemplazar = (lista) => lista.map((p) => (p === viejo ? nuevo : p));
+  g.telefonos = reemplazar(g.telefonos);
+  g.mostrador = reemplazar(g.mostrador);
+  g.refuerzoTelefonos = reemplazar(g.refuerzoTelefonos);
+
+  sabados.forEach((s) => {
+    s.ausentes = reemplazar(s.ausentes || []);
+    s.sustituciones = (s.sustituciones || []).map((sus) => ({
+      ...sus,
+      sustituto: sus.sustituto === viejo ? nuevo : sus.sustituto,
+      sustituido: sus.sustituido === viejo ? nuevo : sus.sustituido,
+    }));
+  });
+}
+
+function renderListaEditable(titulo, personas, { onAñadir, onQuitar, onRenombrar }) {
   const contenedor = document.createElement("div");
   contenedor.className = "fila-personal-rol";
 
@@ -253,8 +273,15 @@ function renderListaEditable(titulo, personas, { onAñadir, onQuitar }) {
   personas.forEach((persona) => {
     const chip = document.createElement("span");
     chip.className = "chip-editable";
-    chip.innerHTML = `${persona} <button type="button" aria-label="Quitar">✕</button>`;
-    chip.querySelector("button").addEventListener("click", () => {
+    chip.innerHTML = `${persona} <button type="button" class="btn-renombrar" aria-label="Renombrar" title="Renombrar">✏️</button><button type="button" aria-label="Quitar" title="Quitar">✕</button>`;
+    const [btnRenombrar, btnQuitar] = chip.querySelectorAll("button");
+    btnRenombrar.addEventListener("click", () => {
+      const nuevo = prompt(`Nuevo nombre para "${persona}":`, persona);
+      if (!nuevo || !nuevo.trim() || nuevo.trim() === persona) return;
+      onRenombrar(persona, nuevo.trim());
+      renderPersonal();
+    });
+    btnQuitar.addEventListener("click", () => {
       onQuitar(persona);
       renderPersonal();
     });
@@ -485,7 +512,6 @@ const ETIQUETAS_ESTADO = {
 
 function render() {
   listaSabados.innerHTML = "";
-  barraGuardar.hidden = sabados.length === 0;
 
   sabados.forEach((sabado) => {
     listaSabados.appendChild(renderTarjeta(sabado));
@@ -571,21 +597,33 @@ function renderTarjeta(sabado) {
   columnas.appendChild(renderColumnaPersonas("🧾 Mostrador", g.mostrador, sabado));
   tarjeta.appendChild(columnas);
 
-  tarjeta.appendChild(renderBloqueSustituciones(sabado, g));
+  const filaDetallesSustitucion = document.createElement("div");
+  filaDetallesSustitucion.className = "fila-detalles-sustitucion";
 
+  const detalles = document.createElement("details");
+  detalles.className = "detalles-tarjeta";
+  const resumenToggle = document.createElement("summary");
+  resumenToggle.textContent = "Detalles";
+  detalles.appendChild(resumenToggle);
   const resumen = document.createElement("div");
   resumen.className = "resumen";
   resumen.innerHTML = `
     <div><strong>Cubren Teléfonos (${resultado.telefonos.length}):</strong> ${resultado.telefonos.join(", ") || "—"}</div>
     <div><strong>Cubren Mostrador (${resultado.mostrador.length}):</strong> ${resultado.mostrador.join(", ") || "—"}</div>
   `;
+  detalles.appendChild(resumen);
+  filaDetallesSustitucion.appendChild(detalles);
+
+  filaDetallesSustitucion.appendChild(renderBloqueSustituciones(sabado, g));
+
+  tarjeta.appendChild(filaDetallesSustitucion);
+
   if (resultado.incidencias.length) {
     const aviso = document.createElement("div");
     aviso.className = "aviso-incidencia";
     aviso.textContent = resultado.incidencias.join(" · ");
-    resumen.appendChild(aviso);
+    tarjeta.appendChild(aviso);
   }
-  tarjeta.appendChild(resumen);
 
   return tarjeta;
 }
@@ -825,7 +863,7 @@ btnImprimir.addEventListener("click", () => {
 btnGuardar.addEventListener("click", async () => {
   if (!getToken()) {
     estadoGuardado.textContent = "";
-    document.getElementById("opciones-avanzadas").open = true;
+    modalAjustes.showModal();
     alert(
       'No tienes guardado automático configurado. Usa "Copiar JSON del mes" y pégalo en GitHub (sección "Guardado manual" abajo), o configura el token en "Guardado automático".'
     );

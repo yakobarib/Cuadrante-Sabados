@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+<div class="cabecera-fija">
 <header>
   <div class="cabecera-fila">
     <div>
@@ -15,6 +16,10 @@
       <p class="subtitle">Marca quién falta y la web calcula sola quién cubre Teléfonos y Mostrador.</p>
     </div>
     <div class="barra-iconos">
+      <div class="grupo-guardar">
+        <button id="btn-guardar" type="button" class="btn-guardar-icono" title="Guardar cambios">💾 Guardar cambios</button>
+        <span id="estado-guardado" class="estado-flotante"></span>
+      </div>
       <button id="btn-tema" type="button" class="btn-icono" title="Cambiar entre modo claro y oscuro">☀️</button>
       <button id="btn-ayuda" type="button" class="btn-icono" title="Ayuda">❓</button>
       <button id="btn-ajustes" type="button" class="btn-icono" title="Ajustes">⚙️</button>
@@ -31,7 +36,7 @@
     <p><strong>+ Sustitución Manual</strong>: úsalo cuando alguien de fuera del grupo del día viene a cubrir a otra persona (cambios de sábado, favores). Marca la ausencia sola y hace que el sustituto cuente para los mínimos.</p>
     <p><strong>💾 Guardar cambios</strong>: guarda el mes. Si hay alguna incidencia (faltan personas para llegar al mínimo), te avisa por email.</p>
     <p><strong>👥 Personal</strong>: añade o quita gente de Teléfonos/Mostrador de cada grupo, y reordena con las flechas quién refuerza primero a Teléfonos si hace falta. Tiene su propio botón de guardar.</p>
-    <p><strong>⚙️ Opciones avanzadas</strong>: configura el guardado automático (un token de GitHub, una sola vez), o usa el copiar/pegar manual si no quieres configurarlo.</p>
+    <p><strong>⚙️ Ajustes</strong>: configura el guardado automático (un token de GitHub, una sola vez), o usa el copiar/pegar manual si no quieres configurarlo.</p>
     <p><strong>🖨️ Imprimir mes</strong>: genera una hoja lista para imprimir o guardar como PDF con el resumen del mes.</p>
   </div>
   <button type="button" class="btn-secundario cerrar-modal">Cerrar</button>
@@ -40,56 +45,8 @@
 <dialog id="modal-ajustes" class="modal">
   <h2>⚙️ Ajustes</h2>
   <div class="modal-contenido">
-    <p>Próximamente.</p>
-  </div>
-  <button type="button" class="btn-secundario cerrar-modal">Cerrar</button>
-</dialog>
 
-<dialog id="modal-login" class="modal">
-  <h2>👤 Iniciar sesión</h2>
-  <div class="modal-contenido">
-    <p>Todavía por decidir cómo funcionará el login. De momento cualquiera con el enlace puede ver y, si tiene el token configurado, guardar cambios.</p>
-  </div>
-  <button type="button" class="btn-secundario cerrar-modal">Cerrar</button>
-</dialog>
-
-<main>
-  <div class="barra-superior">
-    <section class="panel selector-mes">
-      <label class="campo">
-        <span>Mes</span>
-        <select id="select-mes">
-          <option value="">Cargando meses…</option>
-        </select>
-      </label>
-      <div class="campo">
-        <span class="campo-espaciador" aria-hidden="true">&nbsp;</span>
-        <button id="btn-nuevo-mes" type="button" class="btn-secundario">+ Nuevo mes</button>
-      </div>
-      <span id="estado-carga" class="estado-texto"></span>
-    </section>
-
-    <div id="barra-guardar" class="panel caja-guardar" hidden>
-      <button id="btn-guardar" type="button" class="btn-primario">💾 Guardar cambios</button>
-      <span id="estado-guardado" class="estado-texto"></span>
-    </div>
-
-    <div class="columna-derecha">
-    <details id="panel-personal" class="panel panel-flotante">
-      <summary>👥 Personal</summary>
-      <div class="panel-flotante-contenido">
-        <div id="personal-render"></div>
-        <div class="fila" style="margin-top: 12px;">
-          <button id="btn-guardar-personal" type="button" class="btn-primario">💾 Guardar cambios de personal</button>
-        </div>
-        <span id="estado-personal" class="estado-texto"></span>
-      </div>
-    </details>
-    <details id="opciones-avanzadas" class="panel panel-flotante">
-      <summary>⚙️ Opciones avanzadas</summary>
-      <div class="panel-flotante-contenido">
-
-      <div class="bloque-avanzado">
+    <div class="bloque-avanzado">
       <h3>Guardado automático (recomendado)</h3>
       <p>
         Configura una sola vez un token de GitHub para que "Guardar cambios" escriba
@@ -129,19 +86,64 @@
       <button id="btn-cargar-json" type="button" class="btn-secundario">Cargar este JSON</button>
     </div>
 
-      </div>
-    </details>
-    <button id="btn-imprimir" type="button" class="btn-secundario">🖨️ Imprimir mes</button>
+    <div class="bloque-avanzado">
+      <p class="estado-texto">Más ajustes próximamente.</p>
     </div>
-  </div>
 
+  </div>
+  <button type="button" class="btn-secundario cerrar-modal">Cerrar</button>
+</dialog>
+
+<dialog id="modal-login" class="modal">
+  <h2>👤 Iniciar sesión</h2>
+  <div class="modal-contenido">
+    <p>Todavía por decidir cómo funcionará el login. De momento cualquiera con el enlace puede ver y, si tiene el token configurado, guardar cambios.</p>
+  </div>
+  <button type="button" class="btn-secundario cerrar-modal">Cerrar</button>
+</dialog>
+
+<div class="barra-superior">
+  <section class="panel selector-mes">
+    <label class="campo">
+      <span>Mes</span>
+      <select id="select-mes">
+        <option value="">Cargando meses…</option>
+      </select>
+    </label>
+    <div class="campo">
+      <span class="campo-espaciador" aria-hidden="true">&nbsp;</span>
+      <button id="btn-nuevo-mes" type="button" class="btn-secundario">+ Nuevo mes</button>
+    </div>
+    <div class="campo">
+      <span class="campo-espaciador" aria-hidden="true">&nbsp;</span>
+      <details id="panel-personal" class="panel-flotante">
+        <summary>👥 Personal</summary>
+        <div class="panel-flotante-contenido">
+          <div id="personal-render"></div>
+          <div class="fila" style="margin-top: 12px;">
+            <button id="btn-guardar-personal" type="button" class="btn-primario">💾 Guardar cambios de personal</button>
+          </div>
+          <span id="estado-personal" class="estado-texto"></span>
+        </div>
+      </details>
+    </div>
+    <div class="campo">
+      <span class="campo-espaciador" aria-hidden="true">&nbsp;</span>
+      <button id="btn-imprimir" type="button" class="btn-secundario">🖨️ Imprimir mes</button>
+    </div>
+    <span id="estado-carga" class="estado-texto"></span>
+  </section>
+</div>
+</div>
+
+<main>
   <section id="lista-sabados" class="lista-sabados"></section>
 </main>
 
 <footer class="pie-pagina">
   <p>Krafted by <strong>Yakoba Moreno</strong></p>
   <p>Designed in <strong>Claude Code</strong></p>
-  <p class="version">v1.0.2</p>
+  <p class="version">v1.1.0</p>
 </footer>
 
 <div id="hoja-impresion"></div>

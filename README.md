@@ -44,26 +44,32 @@ segundo repositorio privado aparte, dejando aquí solo la web (`docs/`).
 3. Según te vayan llegando las capturas, marca en cada tarjeta: festivo, grupo, y pulsando el
    nombre de cada persona la marcas como ausente (vuelve a pulsar para deshacerlo). El resultado
    (quién cubre Teléfonos/Mostrador y si hay incidencia) se recalcula al momento.
-4. Pulsa "💾 Guardar cambios":
+4. Pulsa "💾 Guardar cambios" (arriba a la derecha, junto a ☀️/❓/⚙️/👤): en gris si no hay nada
+   que guardar, en azul y parpadeando en cuanto hay algún cambio sin guardar.
    - Si tienes el guardado automático configurado (ver abajo), se guarda directamente y ya está.
-   - Si no, te avisa para que uses "Opciones avanzadas → Guardado manual" (copiar JSON y
-     pegarlo en GitHub a mano).
+   - Si no, se abren los "⚙️ Ajustes" para que uses el guardado manual (copiar JSON y pegarlo en
+     GitHub a mano).
 5. Guardar dispara automáticamente la comprobación (`.github/workflows/check-roster.yml`).
    Si hay alguna incidencia, te llega un email.
 
 ### Activar el guardado automático (opcional, recomendado)
 
-En "⚙️ Opciones avanzadas → Guardado automático" tienes el enlace y los pasos para crear un
+En "⚙️ Ajustes → Guardado automático" tienes el enlace y los pasos para crear un
 token de GitHub limitado solo a este repositorio (permiso "Contents: Read and write", nada más).
 Se guarda únicamente en el navegador donde lo pegues — si usas otro ordenador o navegador, hay
 que configurarlo otra vez ahí.
 
 ### Gestión de personal
 
-En "👥 Personal" puedes, sin tocar código:
+En "👥 Personal" (junto a "+ Nuevo mes") puedes, sin tocar código:
 
 - Añadir o quitar a alguien de Teléfonos o Mostrador de cada grupo (cuando entra o se va alguien
   de la empresa).
+- Renombrar a alguien (✏️ en su nombre) — por ejemplo si prefieres "Toni Bonet" en vez de
+  "Toni B". Actualiza el nombre en todas las listas de su grupo y, si hay un mes cargado en ese
+  momento, también en sus ausencias/sustituciones ya marcadas, para que no queden referencias
+  sueltas al nombre antiguo. Los meses ya guardados en otras fechas conservan el nombre tal como
+  estaba cuando se guardaron.
 - Reordenar con las flechas ↑/↓ el "Orden de refuerzo a Teléfonos" de cada grupo — a quién se
   recurre primero si falta gente en Teléfonos.
 - Al añadir a alguien a Mostrador, se coloca automáticamente al final de ese orden de refuerzo;
