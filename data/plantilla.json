@@ -1,14 +1,43 @@
 {
   "grupos": {
     "1": {
-      "telefonos": ["Alex Costa", "Toni Prats"],
-      "mostrador": ["Manolo Pérez", "Marcos", "Pep", "Adrián", "Javi"],
-      "refuerzoTelefonos": ["Adrián", "Manolo Pérez", "Marcos", "Pep", "Javi"]
+      "telefonos": [
+        "Alex Costa",
+        "Toni Prats"
+      ],
+      "mostrador": [
+        "Manolo Pérez",
+        "Marcos",
+        "Pep Ribas",
+        "Adrián",
+        "Javi Gil"
+      ],
+      "refuerzoTelefonos": [
+        "Adrián",
+        "Manolo Pérez",
+        "Marcos",
+        "Pep Ribas",
+        "Javi Gil"
+      ]
     },
     "2": {
-      "telefonos": ["Pepe Ros", "Toni Guasch"],
-      "mostrador": ["Yako", "Iván", "Toni B", "Juan Carlos", "Esteve"],
-      "refuerzoTelefonos": ["Esteve", "Iván", "Toni B", "Juan Carlos"]
+      "telefonos": [
+        "Pepe Ros",
+        "Toni Guasch"
+      ],
+      "mostrador": [
+        "Yako",
+        "Iván",
+        "Toni Bonet",
+        "Juan Carlos",
+        "Esteve"
+      ],
+      "refuerzoTelefonos": [
+        "Esteve",
+        "Iván",
+        "Toni Bonet",
+        "Juan Carlos"
+      ]
     }
   }
 }
