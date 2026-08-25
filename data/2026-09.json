@@ -1,10 +1,37 @@
 {
   "mes": "2026-09",
-  "nota": "Primer mes en producción real.",
   "sabados": [
-    { "fecha": "2026-09-05", "grupo": 1, "festivo": false, "ausentes": [] },
-    { "fecha": "2026-09-12", "grupo": 2, "festivo": false, "ausentes": [] },
-    { "fecha": "2026-09-19", "grupo": 1, "festivo": false, "ausentes": [] },
-    { "fecha": "2026-09-26", "grupo": 2, "festivo": false, "ausentes": [] }
+    {
+      "fecha": "2026-09-05",
+      "grupo": 1,
+      "festivo": false,
+      "ausentes": [],
+      "sustituciones": []
+    },
+    {
+      "fecha": "2026-09-12",
+      "grupo": 2,
+      "festivo": false,
+      "ausentes": [
+        "Iván"
+      ],
+      "sustituciones": []
+    },
+    {
+      "fecha": "2026-09-19",
+      "grupo": 1,
+      "festivo": false,
+      "ausentes": [],
+      "sustituciones": []
+    },
+    {
+      "fecha": "2026-09-26",
+      "grupo": 2,
+      "festivo": false,
+      "ausentes": [
+        "Iván"
+      ],
+      "sustituciones": []
+    }
   ]
 }
