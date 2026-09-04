@@ -881,6 +881,18 @@ function generarHojaImpresion() {
 btnImprimir.addEventListener("click", () => {
   if (!mesActual || !sabados.length) return;
   generarHojaImpresion();
+
+  // Cambia el título de la pestaña mientras dura la impresión: el diálogo de
+  // "Guardar como PDF" lo usa como nombre de archivo sugerido.
+  const tituloOriginal = document.title;
+  const mesCapitalizado = nombreMesLegible(mesActual).replace(/^./, (c) => c.toUpperCase());
+  document.title = `Cuadrante Sábados ${mesCapitalizado}`;
+  const restaurarTitulo = () => {
+    document.title = tituloOriginal;
+    window.removeEventListener("afterprint", restaurarTitulo);
+  };
+  window.addEventListener("afterprint", restaurarTitulo);
+
   window.print();
 });
 

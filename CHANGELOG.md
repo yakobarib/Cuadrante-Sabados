@@ -2,6 +2,11 @@
 
 Todas las novedades notables de este proyecto se documentan aquí.
 
+## [1.6.0] - 2026-09-04
+### Añadido
+- "Imprimir mes" cambia el título de la pestaña al mes en curso justo antes de imprimir (p. ej. "Cuadrante Sábados
+  Octubre 2026"), para que quede sugerido como nombre de archivo al guardar como PDF. Se restaura solo al terminar.
+
 ## [1.5.1] - 2026-09-04
 ### Revertido
 - Los intentos de arreglar la impresión a dos páginas (recortes de espaciado + auto-ajuste con zoom) empeoraron el
