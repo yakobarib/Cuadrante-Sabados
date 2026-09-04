@@ -2,6 +2,15 @@
 
 Todas las novedades notables de este proyecto se documentan aquí.
 
+## [1.5.0] - 2026-09-04
+### Arreglado
+- La impresión seguía saliéndose a una segunda página (casi en blanco) en algunos casos, incluso tras recortar el
+  espaciado — probablemente por diferencias de métrica de fuente entre navegadores/sistemas.
+### Cambiado
+- "Imprimir mes" ahora mide la altura real del contenido **en el propio navegador** justo antes de imprimir y, si no
+  cabe en una página A4, reduce el tamaño (con `zoom`) lo justo para que quepa siempre — en vez de depender de un
+  espaciado fijo calculado de antemano. También se recortaron más los márgenes y tamaños de fuente base.
+
 ## [1.4.1] - 2026-09-04
 ### Arreglado
 - El parpadeo de las pastillas MÍNIMO/INCIDENCIA no se veía en algunos navegadores porque usaba `color-mix()` para el
