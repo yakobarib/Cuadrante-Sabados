@@ -2,6 +2,11 @@
 
 Todas las novedades notables de este proyecto se documentan aquí.
 
+## [1.3.1] - 2026-09-04
+### Arreglado
+- La impresión de un mes de 5 sábados se salía a una segunda página (casi en blanco). Recortado el espaciado y los
+  márgenes de la hoja A4 para que quepa siempre en una sola página, con margen de sobra.
+
 ## [1.3.0] - 2026-09-04
 ### Cambiado
 - Cuando alguien refuerza Teléfonos automáticamente (viene de Mostrador de su propio grupo), su chip se "arrastra"
