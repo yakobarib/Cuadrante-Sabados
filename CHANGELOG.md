@@ -2,6 +2,14 @@
 
 Todas las novedades notables de este proyecto se documentan aquí.
 
+## [1.3.0] - 2026-09-04
+### Cambiado
+- Cuando alguien refuerza Teléfonos automáticamente (viene de Mostrador de su propio grupo), su chip se "arrastra"
+  visualmente a la columna de Teléfonos (con borde discontinuo, distinto de un titular) y desaparece de Mostrador
+  mientras dure el refuerzo — antes solo se veía reflejado en "Detalles", no en las columnas de la tarjeta. Sigue
+  pudiendo marcarse ausente igual que cualquier otra persona, y si lo está, entra el siguiente de la lista de
+  refuerzo automáticamente.
+
 ## [1.2.0] - 2026-08-07
 ### Cambiado
 - Los iconos de la cabecera (☀️/🌙, ❓, ⚙️, 👤) pasan de emoji a iconos de línea (SVG), para que se vean igual en cualquier

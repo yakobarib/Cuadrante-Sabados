@@ -422,6 +422,12 @@ button { font: inherit; cursor: pointer; }
   color: var(--incidencia-text);
   text-decoration: line-through;
 }
+.chip.refuerzo {
+  border-style: dashed;
+}
+.chip.refuerzo::before {
+  content: "⇄ ";
+}
 
 .resumen {
   font-size: 0.9rem;

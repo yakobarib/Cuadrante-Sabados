@@ -594,10 +594,24 @@ function renderTarjeta(sabado) {
   }
 
   const g = grupos[sabado.grupo];
+
+  // Quién refuerza Teléfonos de forma automática (viene de Mostrador de este mismo
+  // grupo, no de una Sustitución Manual) — se "arrastra" visualmente a Teléfonos.
+  const sustitutosTelefonos = new Set(
+    (sabado.sustituciones || []).filter((s) => s.rol === "telefonos").map((s) => s.sustituto)
+  );
+  const refuerzosAutomaticos = resultado.telefonos.filter(
+    (p) => !g.telefonos.includes(p) && !sustitutosTelefonos.has(p)
+  );
+
   const columnas = document.createElement("div");
   columnas.className = "columnas-roles";
-  columnas.appendChild(renderColumnaPersonas("☎ Teléfonos", g.telefonos, sabado));
-  columnas.appendChild(renderColumnaPersonas("🧾 Mostrador", g.mostrador, sabado));
+  columnas.appendChild(
+    renderColumnaPersonas("☎ Teléfonos", g.telefonos, sabado, { extras: refuerzosAutomaticos })
+  );
+  columnas.appendChild(
+    renderColumnaPersonas("🧾 Mostrador", g.mostrador, sabado, { excluir: refuerzosAutomaticos })
+  );
   tarjeta.appendChild(columnas);
 
   const filaDetallesSustitucion = document.createElement("div");
@@ -631,7 +645,7 @@ function renderTarjeta(sabado) {
   return tarjeta;
 }
 
-function renderColumnaPersonas(titulo, personas, sabado) {
+function renderColumnaPersonas(titulo, personas, sabado, { extras = [], excluir = [] } = {}) {
   const columna = document.createElement("div");
   columna.className = "columna-personas";
   const h3 = document.createElement("h3");
@@ -640,13 +654,18 @@ function renderColumnaPersonas(titulo, personas, sabado) {
 
   const chips = document.createElement("div");
   chips.className = "chips";
-  personas.forEach((persona) => {
+
+  const renderChip = (persona, esRefuerzo) => {
     const ausente = sabado.ausentes.includes(persona);
     const chip = document.createElement("button");
     chip.type = "button";
-    chip.className = "chip" + (ausente ? " ausente" : "");
+    chip.className = "chip" + (ausente ? " ausente" : "") + (esRefuerzo ? " refuerzo" : "");
     chip.textContent = persona;
-    chip.title = ausente ? "Ausente — pulsa para marcar como disponible" : "Disponible — pulsa para marcar ausente";
+    chip.title = ausente
+      ? "Ausente — pulsa para marcar como disponible"
+      : esRefuerzo
+      ? "Refuerzo automático desde Mostrador — pulsa para marcar ausente"
+      : "Disponible — pulsa para marcar ausente";
     chip.addEventListener("click", () => {
       if (ausente) {
         sabado.ausentes = sabado.ausentes.filter((p) => p !== persona);
@@ -656,7 +675,11 @@ function renderColumnaPersonas(titulo, personas, sabado) {
       render();
     });
     chips.appendChild(chip);
-  });
+  };
+
+  personas.filter((persona) => !excluir.includes(persona)).forEach((persona) => renderChip(persona, false));
+  extras.forEach((persona) => renderChip(persona, true));
+
   columna.appendChild(chips);
   return columna;
 }
