@@ -2,6 +2,11 @@
 
 Todas las novedades notables de este proyecto se documentan aquí.
 
+## [1.4.0] - 2026-09-04
+### Añadido
+- Las pastillas de estado 🟡 MÍNIMO y 🔴 INCIDENCIA de cada tarjeta parpadean (halo de color pulsante), para que salten
+  a la vista los sábados que necesitan atención. Respeta "reducir movimiento" del sistema.
+
 ## [1.3.1] - 2026-09-04
 ### Arreglado
 - La impresión de un mes de 5 sábados se salía a una segunda página (casi en blanco). Recortado el espaciado y los

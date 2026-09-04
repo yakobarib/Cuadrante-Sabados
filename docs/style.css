@@ -355,6 +355,17 @@ button { font: inherit; cursor: pointer; }
 .pill-incidencia { background: var(--incidencia-bg); color: var(--incidencia-text); }
 .pill-festivo { background: var(--festivo-bg); color: var(--festivo-text); }
 
+.pill-minimo, .pill-incidencia {
+  animation: parpadeo-pill 1.2s ease-in-out infinite;
+}
+@keyframes parpadeo-pill {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent); }
+  50% { box-shadow: 0 0 0 6px color-mix(in srgb, currentColor 0%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pill-minimo, .pill-incidencia { animation: none; }
+}
+
 .tarjeta-controles {
   display: flex;
   flex-wrap: wrap;
