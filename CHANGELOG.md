@@ -2,6 +2,12 @@
 
 Todas las novedades notables de este proyecto se documentan aquí.
 
+## [1.4.1] - 2026-09-04
+### Arreglado
+- El parpadeo de las pastillas MÍNIMO/INCIDENCIA no se veía en algunos navegadores porque usaba `color-mix()` para el
+  color del halo. Cambiado a un parpadeo de opacidad simple (sin funciones CSS modernas), mucho más compatible y más
+  visible.
+
 ## [1.4.0] - 2026-09-04
 ### Añadido
 - Las pastillas de estado 🟡 MÍNIMO y 🔴 INCIDENCIA de cada tarjeta parpadean (halo de color pulsante), para que salten
