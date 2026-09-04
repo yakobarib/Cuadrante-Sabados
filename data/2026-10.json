@@ -1,0 +1,10 @@
+{
+  "mes": "2026-10",
+  "sabados": [
+    { "fecha": "2026-10-03", "grupo": 1, "festivo": false, "ausentes": [], "sustituciones": [] },
+    { "fecha": "2026-10-10", "grupo": 2, "festivo": false, "ausentes": ["Juan Carlos"], "sustituciones": [] },
+    { "fecha": "2026-10-17", "grupo": 1, "festivo": false, "ausentes": ["Alex Costa"], "sustituciones": [] },
+    { "fecha": "2026-10-24", "grupo": 2, "festivo": false, "ausentes": [], "sustituciones": [] },
+    { "fecha": "2026-10-31", "grupo": 1, "festivo": false, "ausentes": [], "sustituciones": [] }
+  ]
+}
