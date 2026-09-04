@@ -2,6 +2,13 @@
 
 Todas las novedades notables de este proyecto se documentan aquí.
 
+## [1.5.1] - 2026-09-04
+### Revertido
+- Los intentos de arreglar la impresión a dos páginas (recortes de espaciado + auto-ajuste con zoom) empeoraron el
+  resultado (letra minúscula y seguía sin caber). Revertido el CSS y el JS de impresión exactamente a la versión
+  anterior a ese intento, que Yakoba había confirmado como buena. Un mes de 5 sábados puede volver a salir en 2
+  páginas — se retomará con otro enfoque más adelante.
+
 ## [1.5.0] - 2026-09-04
 ### Arreglado
 - La impresión seguía saliéndose a una segunda página (casi en blanco) en algunos casos, incluso tras recortar el

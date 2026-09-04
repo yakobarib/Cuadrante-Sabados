@@ -746,7 +746,7 @@ textarea {
 #hoja-impresion { display: none; }
 
 @media print {
-  @page { size: A4 portrait; margin: 7mm 12mm; }
+  @page { size: A4 portrait; margin: 12mm 16mm; }
 
   html, body { background: #fff; }
   body * { visibility: hidden; }
@@ -768,45 +768,44 @@ textarea {
   }
 
   #hoja-impresion h1 {
-    font-size: 1.15rem;
+    font-size: 1.35rem;
     text-align: center;
     letter-spacing: 0.02em;
     color: #17284d;
-    margin: 0;
+    margin: 0 0 0.1rem;
   }
 
   #hoja-impresion .subtitulo-impresion {
     text-align: center;
     font-style: italic;
     color: #5a5a5a;
-    margin: 0 0 0.2rem;
-    font-size: 0.75rem;
+    margin: 0 0 0.6rem;
+    font-size: 0.9rem;
   }
 
   #hoja-impresion .subtitulo-impresion::after {
     content: "";
     display: block;
-    width: 70px;
-    height: 1.5px;
+    width: 80px;
+    height: 2px;
     background: #c9972e;
-    margin: 0.15rem auto 0;
+    margin: 0.4rem auto 0;
   }
 
   #hoja-impresion .bloque-fin-semana {
-    margin-bottom: 0.18rem;
-    padding-bottom: 0.12rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.4rem;
     border-bottom: 1px solid #ddd;
     break-inside: avoid;
   }
   #hoja-impresion .bloque-fin-semana:last-of-type {
     border-bottom: none;
-    margin-bottom: 0;
   }
 
   #hoja-impresion h2 {
-    font-size: 0.8rem;
+    font-size: 0.95rem;
     color: #17284d;
-    margin: 0 0 0.1rem;
+    margin: 0 0 0.3rem;
     font-weight: 700;
   }
 
@@ -816,7 +815,7 @@ textarea {
     padding: 0;
   }
   #hoja-impresion .lista-roles > li.rol {
-    margin: 0 0 0.05rem;
+    margin: 0 0 0.25rem;
   }
 
   #hoja-impresion .etiqueta-rol {
@@ -824,7 +823,7 @@ textarea {
     display: inline-block;
     padding-left: 1.1rem;
     font-weight: 700;
-    font-size: 0.72rem;
+    font-size: 0.85rem;
     color: #1a1a1a;
   }
   #hoja-impresion .etiqueta-rol::before {
@@ -836,15 +835,15 @@ textarea {
 
   #hoja-impresion .lista-personas {
     list-style: none;
-    margin: 0.02rem 0 0;
+    margin: 0.1rem 0 0;
     padding: 0;
   }
   #hoja-impresion .lista-personas li {
     position: relative;
     padding-left: 2.3rem;
     color: #a3721c;
-    font-size: 0.7rem;
-    line-height: 0.95;
+    font-size: 0.8rem;
+    line-height: 1.25;
   }
   #hoja-impresion .lista-personas li::before {
     content: "○";

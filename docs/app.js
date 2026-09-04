@@ -871,7 +871,6 @@ function renderBloqueImpresion(sabado, numero) {
 }
 
 function generarHojaImpresion() {
-  hojaImpresion.style.zoom = "";
   hojaImpresion.innerHTML = `
     <h1>Cuadrante Sábados</h1>
     <p class="subtitulo-impresion">${nombreMesLegible(mesActual).replace(/^./, (c) => c.toUpperCase())}</p>
@@ -879,32 +878,9 @@ function generarHojaImpresion() {
   `;
 }
 
-// Mide la altura real (con las fuentes/medidas de este navegador en concreto) y, si no
-// cabe en una página A4, reduce el tamaño con `zoom` lo justo para que quepa.
-const MM_A_PX = 96 / 25.4;
-const PAGINA_MARGEN_MM = { vertical: 7, horizontal: 12 };
-
-function ajustarEscalaImpresion() {
-  const anchoContenidoPx = (210 - 2 * PAGINA_MARGEN_MM.horizontal) * MM_A_PX;
-  const altoDisponiblePx = (297 - 2 * PAGINA_MARGEN_MM.vertical) * MM_A_PX;
-
-  const estiloPrevio = hojaImpresion.getAttribute("style") || "";
-  hojaImpresion.style.cssText =
-    "display:block; position:fixed; left:-99999px; top:0; visibility:visible; zoom:1; width:" +
-    anchoContenidoPx +
-    "px;";
-
-  const alturaReal = hojaImpresion.scrollHeight;
-  const escala = alturaReal > altoDisponiblePx ? Math.max(0.7, altoDisponiblePx / alturaReal) : 1;
-
-  hojaImpresion.setAttribute("style", estiloPrevio);
-  hojaImpresion.style.zoom = escala < 1 ? String(escala) : "";
-}
-
 btnImprimir.addEventListener("click", () => {
   if (!mesActual || !sabados.length) return;
   generarHojaImpresion();
-  ajustarEscalaImpresion();
   window.print();
 });
 
