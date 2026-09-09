@@ -595,22 +595,34 @@ function renderTarjeta(sabado) {
 
   const g = grupos[sabado.grupo];
 
-  // Quién refuerza Teléfonos de forma automática (viene de Mostrador de este mismo
-  // grupo, no de una Sustitución Manual) — se "arrastra" visualmente a Teléfonos.
-  const sustitutosTelefonos = new Set(
-    (sabado.sustituciones || []).filter((s) => s.rol === "telefonos").map((s) => s.sustituto)
-  );
+  // Quién cubre cada rol sin ser un titular de la lista de ese grupo: refuerzo
+  // automático (viene de Mostrador de este mismo grupo) o Sustitución Manual
+  // (puede venir de fuera del grupo). Ambos se "arrastran" visualmente a su columna.
+  const sustitutosPorRol = { telefonos: new Set(), mostrador: new Set() };
+  (sabado.sustituciones || []).forEach((s) => {
+    if (sustitutosPorRol[s.rol]) sustitutosPorRol[s.rol].add(s.sustituto);
+  });
+
   const refuerzosAutomaticos = resultado.telefonos.filter(
-    (p) => !g.telefonos.includes(p) && !sustitutosTelefonos.has(p)
+    (p) => !g.telefonos.includes(p) && !sustitutosPorRol.telefonos.has(p)
   );
+  const extrasTelefonos = [
+    ...refuerzosAutomaticos,
+    ...[...sustitutosPorRol.telefonos].filter((p) => !g.telefonos.includes(p)),
+  ];
+  const extrasMostrador = [...sustitutosPorRol.mostrador].filter((p) => !g.mostrador.includes(p));
+  const excluirDeMostrador = extrasTelefonos.filter((p) => g.mostrador.includes(p));
 
   const columnas = document.createElement("div");
   columnas.className = "columnas-roles";
   columnas.appendChild(
-    renderColumnaPersonas("☎ Teléfonos", g.telefonos, sabado, { extras: refuerzosAutomaticos })
+    renderColumnaPersonas("☎ Teléfonos", g.telefonos, sabado, { extras: extrasTelefonos })
   );
   columnas.appendChild(
-    renderColumnaPersonas("🧾 Mostrador", g.mostrador, sabado, { excluir: refuerzosAutomaticos })
+    renderColumnaPersonas("🧾 Mostrador", g.mostrador, sabado, {
+      extras: extrasMostrador,
+      excluir: excluirDeMostrador,
+    })
   );
   tarjeta.appendChild(columnas);
 
@@ -664,7 +676,7 @@ function renderColumnaPersonas(titulo, personas, sabado, { extras = [], excluir 
     chip.title = ausente
       ? "Ausente — pulsa para marcar como disponible"
       : esRefuerzo
-      ? "Refuerzo automático desde Mostrador — pulsa para marcar ausente"
+      ? "Refuerzo o sustitución — pulsa para marcar ausente"
       : "Disponible — pulsa para marcar ausente";
     chip.addEventListener("click", () => {
       if (ausente) {

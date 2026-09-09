@@ -2,6 +2,13 @@
 
 Todas las novedades notables de este proyecto se documentan aquí.
 
+## [1.6.1] - 2026-09-09
+### Arreglado
+- El "arrastre" visual (etiqueta con borde discontinuo) solo se aplicaba al refuerzo automático de Teléfonos, no a las
+  Sustituciones Manuales. Ahora una Sustitución Manual también mueve visualmente al sustituto a su columna
+  correspondiente (Teléfonos o Mostrador), aunque venga de fuera del grupo del día — el cálculo, "Detalles" y la
+  impresión ya lo hacían bien, solo faltaba reflejarlo en las etiquetas de la tarjeta.
+
 ## [1.6.0] - 2026-09-04
 ### Añadido
 - "Imprimir mes" cambia el título de la pestaña al mes en curso justo antes de imprimir (p. ej. "Cuadrante Sábados
