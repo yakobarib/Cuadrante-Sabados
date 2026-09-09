@@ -13,15 +13,24 @@
       "grupo": 2,
       "festivo": false,
       "ausentes": [
-        "Iván"
+        "Iván",
+        "Esteve"
       ],
-      "sustituciones": []
+      "sustituciones": [
+        {
+          "sustituto": "Adrián",
+          "sustituido": "Esteve",
+          "rol": "mostrador"
+        }
+      ]
     },
     {
       "fecha": "2026-09-19",
       "grupo": 1,
       "festivo": false,
-      "ausentes": [],
+      "ausentes": [
+        "Adrián"
+      ],
       "sustituciones": []
     },
     {
