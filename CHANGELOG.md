@@ -2,16 +2,6 @@
 
 Todas las novedades notables de este proyecto se documentan aquí.
 
-## [1.7.0] - 2026-09-15
-### Cambiado
-- La cabecera superior pasa a un panel lateral fijo (marca, pie de página con crédito/versión), homogeneizando el
-  diseño con el resto de apps de Yakoba (mismo patrón que Gestor de Tarifas de Lubricantes). El título de la pantalla
-  y los iconos de acción (tema, ayuda, ajustes, login, guardar) se quedan en una cabecera propia arriba del contenido,
-  igual que antes. Sin cambios de funcionalidad — mismos botones, mismos ids, misma lógica.
-### Arreglado
-- Corregido un desbordamiento horizontal en pantallas estrechas (<900px) introducido durante este cambio, donde el
-  contenido no se estiraba al ancho completo tras apilar el panel lateral encima.
-
 ## [1.6.1] - 2026-09-09
 ### Arreglado
 - El "arrastre" visual (etiqueta con borde discontinuo) solo se aplicaba al refuerzo automático de Teléfonos, no a las
