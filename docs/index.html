@@ -8,29 +8,43 @@
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<div class="cabecera-fija">
-<header>
-  <div class="cabecera-fila">
+<div class="app-shell">
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="brand-logo" aria-hidden="true">📅</span>
     <div>
-      <h1>📅 Cuadrante Sábados</h1>
-      <p class="subtitle">Marca quién falta y la web calcula sola quién cubre Teléfonos y Mostrador.</p>
+      <div class="sidebar-title">Cuadrante Sábados</div>
+      <div class="sidebar-sub">Recambios Ibiza</div>
     </div>
-    <div class="barra-iconos">
-      <div class="grupo-guardar">
-        <button id="btn-guardar" type="button" class="btn-guardar-icono" title="Guardar cambios">💾 Guardar cambios</button>
-        <span id="estado-guardado" class="estado-flotante"></span>
-      </div>
-      <button id="btn-tema" type="button" class="btn-icono" title="Cambiar entre modo claro y oscuro" aria-label="Cambiar entre modo claro y oscuro"></button>
-      <button id="btn-ayuda" type="button" class="btn-icono" title="Ayuda" aria-label="Ayuda">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.82 1c0 2-3 2-3 4"></path><line x1="12" y1="17" x2="12" y2="17.01"></line></svg>
-      </button>
-      <button id="btn-ajustes" type="button" class="btn-icono" title="Ajustes" aria-label="Ajustes">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-      </button>
-      <button id="btn-login" type="button" class="btn-icono" title="Iniciar sesión" aria-label="Iniciar sesión">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-      </button>
+  </div>
+  <div class="sidebar-footer">
+    <p>Diseñado por <strong>Yakoba Moreno</strong></p>
+    <p>Desarrollado en <strong>Claude Code</strong></p>
+    <a class="version" href="https://github.com/yakobarib/Cuadrante-Sabados/blob/main/CHANGELOG.md" target="_blank" rel="noopener">v1.7.0</a>
+  </div>
+</aside>
+
+<div class="app-main">
+<header class="app-header">
+  <div>
+    <h1>Cuadrante Sábados</h1>
+    <p class="subtitle">Marca quién falta y la web calcula sola quién cubre Teléfonos y Mostrador.</p>
+  </div>
+  <div class="barra-iconos">
+    <div class="grupo-guardar">
+      <button id="btn-guardar" type="button" class="btn-guardar-icono" title="Guardar cambios">💾 Guardar cambios</button>
+      <span id="estado-guardado" class="estado-flotante"></span>
     </div>
+    <button id="btn-tema" type="button" class="btn-icono" title="Cambiar entre modo claro y oscuro" aria-label="Cambiar entre modo claro y oscuro"></button>
+    <button id="btn-ayuda" type="button" class="btn-icono" title="Ayuda" aria-label="Ayuda">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.82 1c0 2-3 2-3 4"></path><line x1="12" y1="17" x2="12" y2="17.01"></line></svg>
+    </button>
+    <button id="btn-ajustes" type="button" class="btn-icono" title="Ajustes" aria-label="Ajustes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    </button>
+    <button id="btn-login" type="button" class="btn-icono" title="Iniciar sesión" aria-label="Iniciar sesión">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    </button>
   </div>
 </header>
 
@@ -154,17 +168,13 @@
     <span id="estado-carga" class="estado-texto"></span>
   </section>
 </div>
-</div>
 
 <main>
   <section id="lista-sabados" class="lista-sabados"></section>
 </main>
 
-<footer class="pie-pagina">
-  <p>Diseñado por <strong>Yakoba Moreno</strong></p>
-  <p>Desarrollado en <strong>Claude Code</strong></p>
-  <p class="version"><a href="https://github.com/yakobarib/Cuadrante-Sabados/blob/main/CHANGELOG.md" target="_blank" rel="noopener">v1.6.1</a></p>
-</footer>
+</div>
+</div>
 
 <div id="hoja-impresion"></div>
 

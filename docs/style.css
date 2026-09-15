@@ -84,44 +84,73 @@ body {
   font-size: 16px;
 }
 
-.cabecera-fija {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 0.75rem;
-}
-
-header {
-  max-width: 1800px;
+/* ============================================================================
+   Shell: panel lateral fijo + área de contenido (plantilla compartida con el
+   resto de apps de Yakoba, ver Gestor de Tarifas de Lubricantes)
+   ============================================================================ */
+.app-shell {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  max-width: 1900px;
   margin: 0 auto;
-  padding: 1.1rem 1.25rem 0.35rem;
+  padding: 0.9rem 1.25rem 2rem;
 }
-h1 { margin: 0 0 0.15rem; font-size: 1.45rem; }
-.subtitle { color: var(--muted); margin: 0; font-size: 0.95rem; }
 
-.pie-pagina {
-  max-width: 1800px;
-  margin: 1.5rem auto 2rem;
-  padding: 0 1.25rem;
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.85rem;
-  line-height: 1.5;
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem 0.9rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
-.pie-pagina p { margin: 0; }
-.pie-pagina strong { color: var(--text); }
-.pie-pagina .version { margin-top: 0.35rem; font-size: 0.8rem; opacity: 0.7; }
-.pie-pagina .version a { color: inherit; text-decoration: none; }
-.pie-pagina .version a:hover { text-decoration: underline; }
 
-.cabecera-fila {
+.sidebar-brand { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+.brand-logo { font-size: 1.7rem; line-height: 1; }
+.sidebar-title { font-weight: 700; font-size: 0.95rem; line-height: 1.2; }
+.sidebar-sub { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+.sidebar-footer { margin-top: auto; padding-top: 0.8rem; border-top: 1px solid var(--border); text-align: center; }
+.sidebar-footer p { margin: 0; font-size: 0.72rem; line-height: 1.5; color: var(--muted); }
+.sidebar-footer strong { color: var(--text); }
+.sidebar-footer .version { display: block; margin-top: 0.35rem; font-size: 0.72rem; color: var(--muted); text-decoration: none; opacity: 0.85; }
+.sidebar-footer .version:hover { text-decoration: underline; }
+
+.app-main { flex: 1; min-width: 0; }
+
+.app-header {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
   align-items: flex-start;
   justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--bg);
+  padding: 0.2rem 0 0.9rem;
+}
+h1 { margin: 0 0 0.15rem; font-size: 1.35rem; }
+.subtitle { color: var(--muted); margin: 0; font-size: 0.95rem; }
+
+@media (max-width: 900px) {
+  .app-shell { flex-direction: column; align-items: stretch; }
+  .app-main { width: 100%; }
+  .sidebar {
+    width: 100%;
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sidebar-footer { display: none; }
 }
 
 .barra-iconos {
