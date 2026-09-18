@@ -32,7 +32,13 @@
         "Adrián",
         "Manolo Pérez"
       ],
-      "sustituciones": []
+      "sustituciones": [
+        {
+          "sustituto": "Esteve",
+          "sustituido": "Manolo Pérez",
+          "rol": "mostrador"
+        }
+      ]
     },
     {
       "fecha": "2026-09-26",
