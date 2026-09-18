@@ -29,18 +29,32 @@
       "grupo": 1,
       "festivo": false,
       "ausentes": [
-        "Manolo Pérez"
+        "Manolo Pérez",
+        "Adrián"
       ],
-      "sustituciones": []
+      "sustituciones": [
+        {
+          "sustituto": "Esteve",
+          "sustituido": "Adrián",
+          "rol": "mostrador"
+        }
+      ]
     },
     {
       "fecha": "2026-09-26",
       "grupo": 2,
       "festivo": false,
       "ausentes": [
-        "Iván"
+        "Iván",
+        "Pepe Ros"
       ],
-      "sustituciones": []
+      "sustituciones": [
+        {
+          "sustituto": "Adrián",
+          "sustituido": "Iván",
+          "rol": "mostrador"
+        }
+      ]
     }
   ]
 }
