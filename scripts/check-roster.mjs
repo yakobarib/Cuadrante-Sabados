@@ -18,10 +18,11 @@ const DATA_DIR = path.join(__dirname, "..", "data");
 async function cargarGrupos() {
   try {
     const contenido = await readFile(path.join(DATA_DIR, "plantilla.json"), "utf8");
-    return JSON.parse(contenido).grupos;
+    const plantilla = JSON.parse(contenido);
+    return { grupos: plantilla.grupos, adicionales: plantilla.adicionales || [] };
   } catch {
     console.warn("⚠️ No se pudo leer data/plantilla.json, usando GRUPOS_POR_DEFECTO.");
-    return GRUPOS_POR_DEFECTO;
+    return { grupos: GRUPOS_POR_DEFECTO, adicionales: [] };
   }
 }
 
@@ -109,7 +110,7 @@ function generarHtml(bloquesPorMes) {
 }
 
 async function main() {
-  const grupos = await cargarGrupos();
+  const { grupos, adicionales } = await cargarGrupos();
   const ficheros = await ficherosAComprobar();
   const lineasTexto = [];
   const bloquesPorMesHtml = [];
@@ -125,7 +126,7 @@ async function main() {
       continue;
     }
 
-    const resultados = calcularMes(datos, grupos);
+    const resultados = calcularMes(datos, grupos, adicionales);
     const conIncidencia = resultados.filter((r) => r.resultado.estado === "incidencia");
 
     console.log(`\n${datos.mes || path.basename(fichero)}:`);

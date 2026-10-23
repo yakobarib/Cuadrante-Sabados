@@ -19,9 +19,28 @@ export const MIN_TELEFONOS = 2;
 export const MIN_MOSTRADOR = 4;
 export const NORMAL_MOSTRADOR = 5;
 
+// Personas que vienen todos los sábados de un periodo aunque no sean de ese grupo
+// (data/plantilla.json → "adicionales": [{ persona, rol, desde, hasta? }]).
+// Devuelve las que aplican a esa fecha y grupo y que no están ya en las listas del grupo.
+export function adicionalesDelDia(fecha, grupo, grupos, adicionales = []) {
+  const g = grupos?.[grupo];
+  if (!g) return [];
+  return adicionales.filter(
+    (a) =>
+      (!a.desde || fecha >= a.desde) &&
+      (!a.hasta || fecha <= a.hasta) &&
+      !g.telefonos.includes(a.persona) &&
+      !g.mostrador.includes(a.persona)
+  );
+}
+
 // Calcula el resultado de un sábado: quién queda en Teléfonos/Mostrador
-// tras aplicar sustituciones manuales y refuerzos automáticos, y si hay incidencia.
-export function calcularSabado({ grupo, festivo, ausentes = [], sustituciones = [] }, grupos) {
+// tras aplicar adicionales fijos, sustituciones manuales y refuerzos automáticos, y si hay incidencia.
+export function calcularSabado(
+  { fecha, grupo, festivo, ausentes = [], sustituciones = [] },
+  grupos,
+  adicionales = []
+) {
   if (festivo) {
     return { festivo: true, estado: "festivo", telefonos: [], mostrador: [], incidencias: [] };
   }
@@ -39,6 +58,12 @@ export function calcularSabado({ grupo, festivo, ausentes = [], sustituciones = 
 
   let telefonos = g.telefonos.filter((p) => !ausentes.includes(p));
   let mostrador = g.mostrador.filter((p) => !ausentes.includes(p));
+
+  for (const a of adicionalesDelDia(fecha, grupo, grupos, adicionales)) {
+    if (ausentes.includes(a.persona)) continue;
+    if (a.rol === "telefonos" && !telefonos.includes(a.persona)) telefonos.push(a.persona);
+    else if (a.rol === "mostrador" && !mostrador.includes(a.persona)) mostrador.push(a.persona);
+  }
 
   // Sustituciones manuales: se aplican antes del refuerzo automático, para que
   // si ya cubren el hueco no se dispare además un refuerzo innecesario.
@@ -78,10 +103,10 @@ export function calcularSabado({ grupo, festivo, ausentes = [], sustituciones = 
 }
 
 // Calcula todos los sábados de un fichero de mes ({ mes, sabados: [...] }).
-export function calcularMes(datosMes, grupos) {
+export function calcularMes(datosMes, grupos, adicionales = []) {
   return (datosMes.sabados || []).map((sabado) => ({
     ...sabado,
-    resultado: calcularSabado(sabado, grupos),
+    resultado: calcularSabado(sabado, grupos, adicionales),
   }));
 }
 

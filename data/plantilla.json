@@ -39,5 +39,14 @@
         "Juan Carlos"
       ]
     }
-  }
+  },
+  "adicionales": [
+    {
+      "persona": "Pep Ribas",
+      "rol": "mostrador",
+      "desde": "2026-10-24",
+      "hasta": null,
+      "nota": "Viene todos los sábados por decisión propia. Revisar a fin de año (2026-12-31)."
+    }
+  ]
 }

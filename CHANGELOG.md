@@ -2,6 +2,17 @@
 
 Todas las novedades notables de este proyecto se documentan aquí.
 
+## [1.7.0] - 2026-10-23
+### Añadido
+- "Adicionales" en `data/plantilla.json`: personas que vienen todos los sábados de un periodo aunque no sean de ese
+  grupo (`persona`, `rol`, `desde`, `hasta`). Cuentan para los mínimos y salen como etiqueta con borde discontinuo
+  (⇄) en su columna, y se pueden marcar ausentes como cualquiera. Si el sábado ya es de su grupo no se duplican.
+  También lo tiene en cuenta el aviso por email.
+- Primer adicional: Pep Ribas (Mostrador) todos los sábados desde el 24/10/2026, por decisión propia, a revisar a fin
+  de año.
+### Arreglado
+- Guardar el personal desde la web ya no borra el campo `adicionales` de la plantilla.
+
 ## [1.6.1] - 2026-09-09
 ### Arreglado
 - El "arrastre" visual (etiqueta con borde discontinuo) solo se aplicaba al refuerzo automático de Teléfonos, no a las

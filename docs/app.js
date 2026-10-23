@@ -1,4 +1,4 @@
-import { GRUPOS_POR_DEFECTO, calcularSabado, personasDeGrupos } from "./rules.js";
+import { GRUPOS_POR_DEFECTO, calcularSabado, personasDeGrupos, adicionalesDelDia } from "./rules.js";
 
 const OWNER = "yakobarib";
 const REPO = "Cuadrante-Sabados";
@@ -43,6 +43,7 @@ let shaActual = null; // sha del fichero de mes en GitHub, para poder actualizar
 let ultimoGuardadoJson = null; // snapshot del último estado de mes cargado/guardado
 
 let grupos = GRUPOS_POR_DEFECTO;
+let adicionales = []; // personas que vienen todos los sábados de un periodo (plantilla.json)
 let shaPlantilla = null;
 let ultimoGuardadoPlantillaJson = null;
 
@@ -184,9 +185,11 @@ async function cargarPlantilla() {
   try {
     const { datos, sha } = await leerArchivoJson("plantilla.json");
     grupos = datos.grupos;
+    adicionales = datos.adicionales || [];
     shaPlantilla = sha;
   } catch (e) {
     grupos = GRUPOS_POR_DEFECTO;
+    adicionales = [];
     shaPlantilla = null;
     console.warn("No se pudo cargar plantilla.json, usando valores por defecto.", e);
   }
@@ -369,7 +372,7 @@ btnGuardarPersonal.addEventListener("click", async () => {
   try {
     const nuevoSha = await guardarArchivo(
       "plantilla.json",
-      { grupos },
+      { grupos, adicionales },
       shaPlantilla,
       "Actualizar personal (grupos, roles y orden de refuerzo)"
     );
@@ -535,7 +538,7 @@ function actualizarAvisoSinGuardar() {
 }
 
 function renderTarjeta(sabado) {
-  const resultado = calcularSabado(sabado, grupos);
+  const resultado = calcularSabado(sabado, grupos, adicionales);
 
   const tarjeta = document.createElement("article");
   tarjeta.className = `tarjeta estado-${resultado.estado}`;
@@ -606,11 +609,18 @@ function renderTarjeta(sabado) {
   const refuerzosAutomaticos = resultado.telefonos.filter(
     (p) => !g.telefonos.includes(p) && !sustitutosPorRol.telefonos.has(p)
   );
-  const extrasTelefonos = [
+  const fijosDelDia = adicionalesDelDia(sabado.fecha, sabado.grupo, grupos, adicionales);
+  const fijosPorRol = (rol) => fijosDelDia.filter((a) => a.rol === rol).map((a) => a.persona);
+  const sinRepetir = (lista) => [...new Set(lista)];
+  const extrasTelefonos = sinRepetir([
     ...refuerzosAutomaticos,
     ...[...sustitutosPorRol.telefonos].filter((p) => !g.telefonos.includes(p)),
-  ];
-  const extrasMostrador = [...sustitutosPorRol.mostrador].filter((p) => !g.mostrador.includes(p));
+    ...fijosPorRol("telefonos"),
+  ]);
+  const extrasMostrador = sinRepetir([
+    ...[...sustitutosPorRol.mostrador].filter((p) => !g.mostrador.includes(p)),
+    ...fijosPorRol("mostrador"),
+  ]);
   const excluirDeMostrador = extrasTelefonos.filter((p) => g.mostrador.includes(p));
 
   const columnas = document.createElement("div");
@@ -847,7 +857,7 @@ function formatearFechaLarga(fechaIso) {
 }
 
 function renderBloqueImpresion(sabado, numero) {
-  const resultado = calcularSabado(sabado, grupos);
+  const resultado = calcularSabado(sabado, grupos, adicionales);
 
   if (resultado.festivo) {
     const grupoTexto = sabado.grupo ? ` Grupo ${sabado.grupo}` : "";
