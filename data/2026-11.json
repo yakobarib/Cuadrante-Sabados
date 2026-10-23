@@ -24,7 +24,9 @@
       "fecha": "2026-11-21",
       "grupo": 2,
       "festivo": false,
-      "ausentes": [],
+      "ausentes": [
+        "Iván"
+      ],
       "sustituciones": []
     },
     {
