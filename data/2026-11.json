@@ -1,0 +1,38 @@
+{
+  "mes": "2026-11",
+  "sabados": [
+    {
+      "fecha": "2026-11-07",
+      "grupo": 2,
+      "festivo": false,
+      "ausentes": [
+        "Toni Guasch",
+        "Iván"
+      ],
+      "sustituciones": []
+    },
+    {
+      "fecha": "2026-11-14",
+      "grupo": 1,
+      "festivo": false,
+      "ausentes": [
+        "Manolo Pérez"
+      ],
+      "sustituciones": []
+    },
+    {
+      "fecha": "2026-11-21",
+      "grupo": 2,
+      "festivo": false,
+      "ausentes": [],
+      "sustituciones": []
+    },
+    {
+      "fecha": "2026-11-28",
+      "grupo": 1,
+      "festivo": false,
+      "ausentes": [],
+      "sustituciones": []
+    }
+  ]
+}
