@@ -46,7 +46,9 @@
       "fecha": "2026-10-31",
       "grupo": 1,
       "festivo": false,
-      "ausentes": [],
+      "ausentes": [
+        "Javi Gil"
+      ],
       "sustituciones": []
     }
   ]
