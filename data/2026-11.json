@@ -6,7 +6,8 @@
       "grupo": 2,
       "festivo": false,
       "ausentes": [
-        "Toni Guasch"
+        "Toni Guasch",
+        "Iván"
       ],
       "sustituciones": []
     },
@@ -23,7 +24,9 @@
       "fecha": "2026-11-21",
       "grupo": 2,
       "festivo": false,
-      "ausentes": [],
+      "ausentes": [
+        "Iván"
+      ],
       "sustituciones": []
     },
     {
