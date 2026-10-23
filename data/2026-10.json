@@ -37,7 +37,9 @@
       "fecha": "2026-10-24",
       "grupo": 2,
       "festivo": false,
-      "ausentes": [],
+      "ausentes": [
+        "Iván"
+      ],
       "sustituciones": []
     },
     {
