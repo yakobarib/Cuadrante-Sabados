@@ -392,6 +392,15 @@ btnGuardarPersonal.addEventListener("click", async () => {
 
 // ---------- Cargar lista de meses disponibles ----------
 
+// Mes en curso si existe; si no, el más cercano ya pasado, y si no hay ninguno, el siguiente.
+function mesPorDefecto(meses) {
+  const hoy = new Date();
+  const actual = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}`;
+  if (meses.includes(actual)) return actual;
+  const anteriores = meses.filter((m) => m < actual);
+  return anteriores.length ? anteriores[anteriores.length - 1] : meses[0];
+}
+
 async function cargarListaMeses() {
   try {
     const resp = await fetchConReintento(API_BASE);
@@ -415,8 +424,7 @@ async function cargarListaMeses() {
       opt.textContent = nombreMesLegible(mes);
       selectMes.appendChild(opt);
     });
-    // Selecciona por defecto el último mes (más reciente)
-    selectMes.value = meses[meses.length - 1];
+    selectMes.value = mesPorDefecto(meses);
     await cargarMes(selectMes.value);
   } catch (e) {
     estadoCarga.textContent = `No se pudo cargar la lista de meses (${e.message}). Puedes cargar un JSON a mano en "Opciones avanzadas".`;

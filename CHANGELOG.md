@@ -2,6 +2,11 @@
 
 Todas las novedades notables de este proyecto se documentan aquí.
 
+## [1.7.1] - 2026-10-30
+### Cambiado
+- Al abrir la web se carga el mes en curso (en vez del último mes creado). Si ese mes todavía no existe, abre el
+  más reciente ya pasado, y si no hay ninguno, el primero disponible.
+
 ## [1.7.0] - 2026-10-23
 ### Añadido
 - "Adicionales" en `data/plantilla.json`: personas que vienen todos los sábados de un periodo aunque no sean de ese
