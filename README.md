@@ -139,6 +139,9 @@ python -m http.server 8000
 
 ## Importar un mes desde el Excel del sistema de horarios
 
+Lo normal es hacerlo desde la web: botón «📥 Importar Excel», arrastrar el informe, revisar la vista previa y pulsar
+«Cargar en la app»; después «💾 Guardar cambios». Lo mismo, desde la línea de comandos:
+
 ```
 pip install openpyxl
 python scripts/excel_a_cuadrante.py "informe.xlsx"

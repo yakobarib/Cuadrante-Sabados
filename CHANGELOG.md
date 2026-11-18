@@ -2,6 +2,16 @@
 
 Todas las novedades notables de este proyecto se documentan aquí.
 
+## [1.8.0] - 2026-11-18
+### Añadido
+- «📥 Importar Excel» (junto a «+ Nuevo mes»): se arrastra el «Informe calendario» del sistema de horarios, que puede
+  traer uno o varios meses. Se lee en el navegador (no se sube a ningún sitio), muestra una vista previa con las
+  ausencias, el estado de cada sábado y los avisos (vacaciones solicitadas sin confirmar, personas que no aparecen),
+  y al aceptar deja los meses cargados **sin guardar**. «💾 Guardar cambios» guarda de una vez todos los meses
+  importados. Los meses que ya existen salen desmarcados para no pisar cambios manuales.
+- La tabla que traduce los nombres del Excel a los de la app (`nombresExcel`) vive en `data/plantilla.json`.
+- El desplegable de meses marca con «• sin guardar» los meses importados aún sin guardar.
+
 ## [1.7.2] - 2026-11-18
 ### Añadido
 - `scripts/excel_a_cuadrante.py`: convierte el "Informe calendario" Excel del sistema de horarios en los ficheros

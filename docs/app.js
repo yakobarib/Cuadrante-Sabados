@@ -1,4 +1,5 @@
 import { GRUPOS_POR_DEFECTO, calcularSabado, personasDeGrupos, adicionalesDelDia } from "./rules.js";
+import { leerInforme, construirCuadrantes } from "./importar-excel.js";
 
 const OWNER = "yakobarib";
 const REPO = "Cuadrante-Sabados";
@@ -44,6 +45,10 @@ let ultimoGuardadoJson = null; // snapshot del último estado de mes cargado/gua
 
 let grupos = GRUPOS_POR_DEFECTO;
 let adicionales = []; // personas que vienen todos los sábados de un periodo (plantilla.json)
+let nombresExcel = {}; // nombre en el Excel de horarios -> nombre en la app (plantilla.json)
+let mesesEnRepo = []; // meses que existen como fichero en GitHub
+// Meses importados desde Excel que todavía no se han guardado: mes -> { sabados, sha }
+const mesesPendientes = new Map();
 let shaPlantilla = null;
 let ultimoGuardadoPlantillaJson = null;
 
@@ -186,10 +191,12 @@ async function cargarPlantilla() {
     const { datos, sha } = await leerArchivoJson("plantilla.json");
     grupos = datos.grupos;
     adicionales = datos.adicionales || [];
+    nombresExcel = datos.nombresExcel || {};
     shaPlantilla = sha;
   } catch (e) {
     grupos = GRUPOS_POR_DEFECTO;
     adicionales = [];
+    nombresExcel = {};
     shaPlantilla = null;
     console.warn("No se pudo cargar plantilla.json, usando valores por defecto.", e);
   }
@@ -372,7 +379,7 @@ btnGuardarPersonal.addEventListener("click", async () => {
   try {
     const nuevoSha = await guardarArchivo(
       "plantilla.json",
-      { grupos, adicionales },
+      { grupos, adicionales, nombresExcel },
       shaPlantilla,
       "Actualizar personal (grupos, roles y orden de refuerzo)"
     );
@@ -401,6 +408,19 @@ function mesPorDefecto(meses) {
   return anteriores.length ? anteriores[anteriores.length - 1] : meses[0];
 }
 
+// Rellena el desplegable con los meses del repositorio más los importados aún sin guardar.
+function rellenarSelectorMeses(mesesRepo) {
+  const todos = [...new Set([...mesesRepo, ...mesesPendientes.keys()])].sort();
+  selectMes.innerHTML = "";
+  todos.forEach((mes) => {
+    const opt = document.createElement("option");
+    opt.value = mes;
+    opt.textContent = nombreMesLegible(mes) + (mesesPendientes.has(mes) ? " • sin guardar" : "");
+    selectMes.appendChild(opt);
+  });
+  return todos;
+}
+
 async function cargarListaMeses() {
   try {
     const resp = await fetchConReintento(API_BASE);
@@ -411,20 +431,15 @@ async function cargarListaMeses() {
       .map((f) => f.name.replace(".json", ""))
       .sort();
 
-    selectMes.innerHTML = "";
-    if (!meses.length) {
+    mesesEnRepo = meses;
+    const todos = rellenarSelectorMeses(meses);
+    if (!todos.length) {
       const opt = document.createElement("option");
       opt.textContent = "No hay meses todavía — crea uno con «+ Nuevo mes»";
       selectMes.appendChild(opt);
       return;
     }
-    meses.forEach((mes) => {
-      const opt = document.createElement("option");
-      opt.value = mes;
-      opt.textContent = nombreMesLegible(mes);
-      selectMes.appendChild(opt);
-    });
-    selectMes.value = mesPorDefecto(meses);
+    selectMes.value = mesPorDefecto(todos);
     await cargarMes(selectMes.value);
   } catch (e) {
     estadoCarga.textContent = `No se pudo cargar la lista de meses (${e.message}). Puedes cargar un JSON a mano en "Opciones avanzadas".`;
@@ -446,6 +461,16 @@ function normalizarSabado(s) {
 }
 
 async function cargarMes(mes) {
+  if (mesesPendientes.has(mes)) {
+    const pendiente = mesesPendientes.get(mes);
+    mesActual = mes;
+    shaActual = pendiente.sha;
+    sabados = pendiente.sabados; // misma referencia: las ediciones quedan en el mes pendiente
+    ultimoGuardadoJson = null;
+    estadoCarga.textContent = "";
+    render();
+    return;
+  }
   estadoCarga.textContent = "Cargando…";
   try {
     const { datos, sha } = await leerArchivoJson(`${mes}.json`);
@@ -536,11 +561,18 @@ function render() {
 }
 
 function actualizarAvisoSinGuardar() {
-  const sinGuardar = !!mesActual && snapshotActual() !== ultimoGuardadoJson;
+  const pendientes = mesesPendientes.size;
+  const sinGuardar = pendientes > 0 || (!!mesActual && snapshotActual() !== ultimoGuardadoJson);
   btnGuardar.classList.toggle("parpadeando", sinGuardar);
-  if (sinGuardar && !estadoGuardado.textContent) {
-    estadoGuardado.textContent = "Tienes cambios sin guardar";
-  } else if (!sinGuardar && estadoGuardado.textContent === "Tienes cambios sin guardar") {
+  const aviso =
+    pendientes > 1
+      ? `Tienes ${pendientes} meses importados sin guardar`
+      : pendientes === 1
+      ? "Tienes 1 mes importado sin guardar"
+      : "Tienes cambios sin guardar";
+  if (sinGuardar && (!estadoGuardado.textContent || estadoGuardado.textContent.startsWith("Tienes "))) {
+    estadoGuardado.textContent = aviso;
+  } else if (!sinGuardar && estadoGuardado.textContent.startsWith("Tienes ")) {
     estadoGuardado.textContent = "";
   }
 }
@@ -853,6 +885,261 @@ btnCargarJson.addEventListener("click", () => {
   }
 });
 
+// ---------- Importar Excel de horarios ----------
+
+const btnImportar = el("btn-importar");
+const modalImportar = el("modal-importar");
+const zonaExcel = el("zona-excel");
+const inputExcel = el("input-excel");
+const estadoImportar = el("estado-importar");
+const vistaPreviaExcel = el("vista-previa-excel");
+const selectPrimerGrupo = el("importar-primer-grupo");
+const chkSolicitados = el("importar-solicitados");
+const listaAvisosImportar = el("importar-avisos");
+const contenedorMesesImportar = el("importar-meses");
+const textoIgnorados = el("importar-ignorados");
+const btnImportarCargar = el("btn-importar-cargar");
+
+const EXCELJS_URL = "https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js";
+let informeExcel = null; // { sabados, ignorados, encontrados } leído del Excel
+let mesesImportables = []; // [{ mes, sabados }] según las opciones elegidas
+const seleccionImportar = new Map(); // mes -> marcado para cargar
+
+// La librería para leer Excel solo se descarga la primera vez que se usa la importación.
+function cargarExcelJS() {
+  if (window.ExcelJS) return Promise.resolve(window.ExcelJS);
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = EXCELJS_URL;
+    script.onload = () => resolve(window.ExcelJS);
+    script.onerror = () =>
+      reject(new Error("No se ha podido cargar la librería para leer Excel (¿sin conexión a internet?)."));
+    document.head.appendChild(script);
+  });
+}
+
+function reiniciarImportacion() {
+  informeExcel = null;
+  mesesImportables = [];
+  seleccionImportar.clear();
+  vistaPreviaExcel.hidden = true;
+  btnImportarCargar.disabled = true;
+  estadoImportar.textContent = "";
+  inputExcel.value = "";
+}
+
+async function actualizarMesesEnRepo() {
+  const resp = await fetchConReintento(API_BASE);
+  if (!resp.ok) return;
+  mesesEnRepo = (await resp.json())
+    .filter((f) => f.name.endsWith(".json") && f.name !== "plantilla.json")
+    .map((f) => f.name.replace(".json", ""))
+    .sort();
+}
+
+// Grupo que le toca al primer sábado del Excel, según el último sábado guardado antes de esa fecha.
+async function grupoInicialSugerido(primeraFecha) {
+  const mesPrimero = primeraFecha.slice(0, 7);
+  const previos = [...new Set([...mesesEnRepo, ...mesesPendientes.keys()])].filter((m) => m < mesPrimero).sort();
+  if (!previos.length) return null;
+  const previo = previos[previos.length - 1];
+  const lista = mesesPendientes.has(previo)
+    ? mesesPendientes.get(previo).sabados
+    : (await leerArchivoJson(`${previo}.json`)).datos.sabados || [];
+  const ultimo = lista.filter((s) => s.grupo).sort((a, b) => a.fecha.localeCompare(b.fecha)).pop();
+  if (!ultimo) return null;
+  return ultimo.grupo === 1 ? 2 : 1;
+}
+
+async function procesarExcel(archivo) {
+  if (!archivo) return;
+  if (!/\.xlsx$/i.test(archivo.name)) {
+    estadoImportar.textContent = "❌ Tiene que ser un archivo Excel (.xlsx).";
+    return;
+  }
+  estadoImportar.textContent = "Leyendo el Excel…";
+  try {
+    const ExcelJS = await cargarExcelJS();
+    informeExcel = await leerInforme(ExcelJS, await archivo.arrayBuffer(), nombresExcel);
+    try {
+      await actualizarMesesEnRepo();
+    } catch {
+      /* se usan los meses que ya conocía la página */
+    }
+    let sugerido = null;
+    try {
+      sugerido = await grupoInicialSugerido(informeExcel.sabados[0].fecha);
+    } catch {
+      /* se deja que lo indique ella */
+    }
+    selectPrimerGrupo.value = String(sugerido ?? 1);
+    seleccionImportar.clear();
+    estadoImportar.textContent = sugerido
+      ? `✅ ${archivo.name} leído.`
+      : `✅ ${archivo.name} leído. No hay un mes anterior guardado: indica tú qué grupo hace el primer sábado.`;
+    pintarVistaPreviaImportar();
+  } catch (e) {
+    informeExcel = null;
+    vistaPreviaExcel.hidden = true;
+    btnImportarCargar.disabled = true;
+    const conocido = /^(No reconozco|No se ha podido cargar)/.test(e.message);
+    estadoImportar.textContent =
+      "❌ " +
+      (conocido
+        ? e.message
+        : "No he podido leer el archivo. Tiene que ser el Excel (.xlsx) «Informe calendario» del sistema de horarios.");
+  }
+}
+
+function renderMesImportable(m) {
+  const existe = mesesEnRepo.includes(m.mes) ? "repo" : mesesPendientes.has(m.mes) ? "pendiente" : null;
+  if (!seleccionImportar.has(m.mes)) seleccionImportar.set(m.mes, !existe);
+
+  const caja = document.createElement("div");
+  caja.className = "mes-importar";
+
+  const cabecera = document.createElement("label");
+  cabecera.className = "mes-importar-cabecera";
+  const casilla = document.createElement("input");
+  casilla.type = "checkbox";
+  casilla.checked = seleccionImportar.get(m.mes);
+  casilla.addEventListener("change", () => {
+    seleccionImportar.set(m.mes, casilla.checked);
+    actualizarBotonImportar();
+  });
+  const titulo = document.createElement("span");
+  titulo.textContent = nombreMesLegible(m.mes);
+  const nota = document.createElement("span");
+  nota.className = "nota";
+  nota.textContent = !existe
+    ? "mes nuevo"
+    : existe === "repo"
+    ? "ya existe: si lo marcas, se sustituye y se pierden sus cambios manuales"
+    : "ya importado y sin guardar: si lo marcas, se sustituye";
+  cabecera.append(casilla, titulo, nota);
+
+  const tabla = document.createElement("table");
+  tabla.className = "tabla-importar";
+  m.sabados.forEach((sabado) => {
+    const resultado = calcularSabado(sabado, grupos, adicionales);
+    const fila = tabla.insertRow();
+    fila.insertCell().textContent = formatearFechaCorta(sabado.fecha);
+    fila.insertCell().textContent = `Grupo ${sabado.grupo}`;
+    fila.insertCell().textContent = sabado.festivo
+      ? "Festivo"
+      : sabado.ausentes.length
+      ? `Ausentes: ${sabado.ausentes.join(", ")}`
+      : "Sin ausencias";
+    fila.insertCell().textContent = ETIQUETAS_ESTADO[resultado.estado];
+  });
+
+  caja.append(cabecera, tabla);
+  return caja;
+}
+
+function pintarVistaPreviaImportar() {
+  const { meses, avisos } = construirCuadrantes(informeExcel.sabados, {
+    primerGrupo: Number(selectPrimerGrupo.value),
+    grupos,
+    adicionales,
+    incluirSolicitados: chkSolicitados.checked,
+  });
+  mesesImportables = meses;
+
+  const todosLosAvisos = [...avisos];
+  const sinFila = personasDeGrupos(grupos).filter((p) => !informeExcel.encontrados.includes(p));
+  if (sinFila.length) {
+    todosLosAvisos.push(
+      `No aparecen en el Excel (¿cambio de nombre, baja?): ${sinFila.join(", ")}. Se cuentan como disponibles.`
+    );
+  }
+  listaAvisosImportar.replaceChildren(
+    ...todosLosAvisos.map((texto) => {
+      const li = document.createElement("li");
+      li.textContent = texto;
+      return li;
+    })
+  );
+  textoIgnorados.textContent = informeExcel.ignorados.length
+    ? `Personas del Excel que no están en la tabla de nombres (se ignoran): ${informeExcel.ignorados.join("; ")}.`
+    : "";
+  contenedorMesesImportar.replaceChildren(...meses.map(renderMesImportable));
+  vistaPreviaExcel.hidden = false;
+  actualizarBotonImportar();
+}
+
+function actualizarBotonImportar() {
+  btnImportarCargar.disabled = ![...seleccionImportar.values()].some(Boolean);
+}
+
+btnImportar.addEventListener("click", () => {
+  reiniciarImportacion();
+  if (!Object.keys(nombresExcel).length) {
+    estadoImportar.textContent =
+      "⚠️ La plantilla no tiene la tabla de nombres del Excel («nombresExcel» en data/plantilla.json).";
+  }
+  modalImportar.showModal();
+});
+
+zonaExcel.addEventListener("click", (e) => {
+  if (e.target !== inputExcel) inputExcel.click();
+});
+zonaExcel.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    inputExcel.click();
+  }
+});
+inputExcel.addEventListener("change", () => procesarExcel(inputExcel.files[0]));
+modalImportar.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  zonaExcel.classList.add("arrastrando");
+});
+modalImportar.addEventListener("dragleave", (e) => {
+  if (e.target === modalImportar || e.target === zonaExcel) zonaExcel.classList.remove("arrastrando");
+});
+modalImportar.addEventListener("drop", (e) => {
+  e.preventDefault();
+  zonaExcel.classList.remove("arrastrando");
+  procesarExcel(e.dataTransfer.files[0]);
+});
+selectPrimerGrupo.addEventListener("change", () => informeExcel && pintarVistaPreviaImportar());
+chkSolicitados.addEventListener("change", () => informeExcel && pintarVistaPreviaImportar());
+
+btnImportarCargar.addEventListener("click", async () => {
+  const elegidos = mesesImportables.filter((m) => seleccionImportar.get(m.mes));
+  if (!elegidos.length) return;
+  if (
+    mesActual &&
+    !mesesPendientes.has(mesActual) &&
+    snapshotActual() !== ultimoGuardadoJson &&
+    !confirm("Tienes cambios sin guardar en el mes que estás viendo y se perderán al cambiar de mes. ¿Continuar?")
+  ) {
+    return;
+  }
+  btnImportarCargar.disabled = true;
+  try {
+    for (const m of elegidos) {
+      let sha = null;
+      if (mesesPendientes.has(m.mes)) sha = mesesPendientes.get(m.mes).sha;
+      else if (mesesEnRepo.includes(m.mes)) sha = (await leerArchivoJson(`${m.mes}.json`)).sha;
+      mesesPendientes.set(m.mes, { sabados: m.sabados.map(normalizarSabado), sha });
+    }
+  } catch (e) {
+    estadoImportar.textContent = `❌ No se ha podido preparar la importación: ${e.message}`;
+    btnImportarCargar.disabled = false;
+    return;
+  }
+  modalImportar.close();
+  rellenarSelectorMeses(mesesEnRepo);
+  selectMes.value = elegidos[0].mes;
+  await cargarMes(elegidos[0].mes);
+  estadoCarga.textContent = `Importado: ${elegidos
+    .map((m) => nombreMesLegible(m.mes))
+    .join(" y ")}. Revísalo y pulsa «Guardar cambios».`;
+  actualizarAvisoSinGuardar();
+});
+
 // ---------- Impresión (A4) ----------
 
 function formatearFechaLarga(fechaIso) {
@@ -941,15 +1228,28 @@ btnGuardar.addEventListener("click", async () => {
   btnGuardar.disabled = true;
   estadoGuardado.textContent = "Guardando…";
   try {
-    const datos = { mes: mesActual, sabados };
-    const nuevoSha = await guardarArchivo(
-      `${mesActual}.json`,
-      datos,
-      shaActual,
-      `Actualizar cuadrante de ${mesActual}`
-    );
-    shaActual = nuevoSha;
-    ultimoGuardadoJson = snapshotActual();
+    const hayPendientes = mesesPendientes.size > 0;
+    if (mesesPendientes.has(mesActual) || snapshotActual() !== ultimoGuardadoJson || !hayPendientes) {
+      const nuevoSha = await guardarArchivo(
+        `${mesActual}.json`,
+        { mes: mesActual, sabados },
+        shaActual,
+        `Actualizar cuadrante de ${mesActual}`
+      );
+      shaActual = nuevoSha;
+      ultimoGuardadoJson = snapshotActual();
+      mesesPendientes.delete(mesActual);
+    }
+    for (const [mes, pendiente] of [...mesesPendientes]) {
+      estadoGuardado.textContent = `Guardando ${nombreMesLegible(mes)}…`;
+      await guardarArchivo(
+        `${mes}.json`,
+        { mes, sabados: pendiente.sabados },
+        pendiente.sha,
+        `Actualizar cuadrante de ${mes}`
+      );
+      mesesPendientes.delete(mes);
+    }
     estadoGuardado.textContent = "✅ Guardado. Si hay alguna incidencia, te llegará un email en breve.";
     actualizarAvisoSinGuardar();
     await cargarListaMesesSinRecargar();
@@ -970,14 +1270,9 @@ async function cargarListaMesesSinRecargar() {
       .map((f) => f.name.replace(".json", ""))
       .sort();
     const valorPrevio = selectMes.value;
-    selectMes.innerHTML = "";
-    meses.forEach((mes) => {
-      const opt = document.createElement("option");
-      opt.value = mes;
-      opt.textContent = nombreMesLegible(mes);
-      selectMes.appendChild(opt);
-    });
-    selectMes.value = meses.includes(valorPrevio) ? valorPrevio : mesActual;
+    mesesEnRepo = meses;
+    const todos = rellenarSelectorMeses(meses);
+    selectMes.value = todos.includes(valorPrevio) ? valorPrevio : mesActual;
   } catch {
     /* no crítico */
   }

@@ -39,6 +39,7 @@
   <div class="modal-contenido">
     <p><strong>Mes</strong>: elige el mes que quieres ver o editar. Los meses ya guardados se cargan solos; "+ Nuevo mes" crea uno vacío.</p>
     <p><strong>👥 Personal</strong> (junto a "+ Nuevo mes"): añade o quita gente de Teléfonos/Mostrador de cada grupo, reordena con las flechas ↑/↓ quién refuerza primero a Teléfonos si hace falta, y renombra a alguien pulsando el ✏️ junto a su nombre. Tiene su propio botón de guardar.</p>
+    <p><strong>📥 Importar Excel</strong>: arrastra el informe de horarios que te pasan (uno o varios meses). Ves una vista previa con las ausencias de cada sábado y, al aceptar, los meses se cargan sin guardar; revísalos y pulsa 💾 Guardar cambios.</p>
     <p><strong>🖨️ Imprimir mes</strong>: genera una hoja lista para imprimir o guardar como PDF con el resumen del mes.</p>
     <p><strong>En cada tarjeta de sábado</strong>: pulsa "Festivo" si ese día no se trabaja, elige el Grupo que le toca, y pulsa el nombre de cada persona para marcarla ausente o disponible (se ve al momento quién queda cubriendo Teléfonos/Mostrador). El desplegable "Detalles" muestra quién cubre cada rol tras aplicar los refuerzos; si hay algún problema, aparece siempre visible debajo, aunque "Detalles" esté cerrado.</p>
     <p><strong>+ Sustitución Manual</strong>: úsalo cuando alguien de fuera del grupo del día viene a cubrir a otra persona (cambios de sábado, favores). Marca la ausencia sola y hace que el sustituto cuente para los mínimos.</p>
@@ -114,6 +115,33 @@
   <button type="button" class="btn-secundario cerrar-modal">Cerrar</button>
 </dialog>
 
+<dialog id="modal-importar" class="modal modal-ancho">
+  <h2>📥 Importar Excel de horarios</h2>
+  <div class="modal-contenido">
+    <p>Arrastra aquí el «Informe calendario» que te pasan (puede traer uno o varios meses). Se lee en tu ordenador, no se sube a ningún sitio, y antes de cargar nada ves una vista previa.</p>
+    <div id="zona-excel" class="zona-excel" tabindex="0" role="button">
+      <strong>Arrastra el Excel aquí</strong> o pulsa para elegirlo
+      <input type="file" id="input-excel" accept=".xlsx" hidden />
+    </div>
+    <p id="estado-importar" class="estado-texto"></p>
+    <div id="vista-previa-excel" hidden>
+      <div class="fila opciones-importar">
+        <label class="campo-inline">El primer sábado lo hace el
+          <select id="importar-primer-grupo"><option value="1">Grupo 1</option><option value="2">Grupo 2</option></select>
+        </label>
+        <label class="campo-inline"><input type="checkbox" id="importar-solicitados" /> Contar también las ausencias solicitadas (sin confirmar)</label>
+      </div>
+      <ul id="importar-avisos" class="avisos-importar"></ul>
+      <div id="importar-meses"></div>
+      <p id="importar-ignorados" class="estado-texto"></p>
+    </div>
+  </div>
+  <div class="fila">
+    <button id="btn-importar-cargar" type="button" class="btn-primario" disabled>Cargar en la app</button>
+    <button type="button" class="btn-secundario cerrar-modal">Cerrar</button>
+  </div>
+</dialog>
+
 <dialog id="modal-login" class="modal">
   <h2>👤 Iniciar sesión</h2>
   <div class="modal-contenido">
@@ -133,6 +161,10 @@
     <div class="campo">
       <span class="campo-espaciador" aria-hidden="true">&nbsp;</span>
       <button id="btn-nuevo-mes" type="button" class="btn-secundario">+ Nuevo mes</button>
+    </div>
+    <div class="campo">
+      <span class="campo-espaciador" aria-hidden="true">&nbsp;</span>
+      <button id="btn-importar" type="button" class="btn-secundario">📥 Importar Excel</button>
     </div>
     <div class="campo">
       <span class="campo-espaciador" aria-hidden="true">&nbsp;</span>
@@ -163,7 +195,7 @@
 <footer class="pie-pagina">
   <p>Diseñado por <strong>Yakoba Moreno</strong></p>
   <p>Desarrollado en <strong>Claude Code</strong></p>
-  <p class="version"><a href="https://github.com/yakobarib/Cuadrante-Sabados/blob/main/CHANGELOG.md" target="_blank" rel="noopener">v1.7.2</a></p>
+  <p class="version"><a href="https://github.com/yakobarib/Cuadrante-Sabados/blob/main/CHANGELOG.md" target="_blank" rel="noopener">v1.8.0</a></p>
 </footer>
 
 <div id="hoja-impresion"></div>

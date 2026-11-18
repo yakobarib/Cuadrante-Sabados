@@ -538,6 +538,45 @@ button { font: inherit; cursor: pointer; }
   color: var(--text);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
 }
+.modal-ancho { width: min(760px, 94vw); max-height: 88vh; }
+
+.zona-excel {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 1.4rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  color: var(--muted);
+}
+.zona-excel:hover, .zona-excel:focus-visible, .zona-excel.arrastrando {
+  border-color: var(--accent);
+  color: var(--text);
+  outline: none;
+}
+.zona-excel.arrastrando { background: var(--bg); }
+
+.opciones-importar { gap: 1rem; flex-wrap: wrap; align-items: center; }
+.campo-inline { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; }
+.avisos-importar {
+  margin: 0;
+  padding: 0.6rem 0.9rem 0.6rem 1.8rem;
+  background: var(--minimo-bg);
+  color: var(--minimo-text);
+  border-radius: 10px;
+  font-size: 0.88rem;
+}
+.avisos-importar:empty { display: none; }
+.mes-importar {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  margin-top: 0.6rem;
+}
+.mes-importar-cabecera { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; font-weight: 700; }
+.mes-importar-cabecera .nota { font-weight: 400; color: var(--muted); font-size: 0.85rem; }
+.tabla-importar { width: 100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.9rem; }
+.tabla-importar td { padding: 0.25rem 0.5rem; border-top: 1px solid var(--border); vertical-align: top; }
+
 .modal::backdrop {
   background: rgba(0, 0, 0, 0.45);
 }

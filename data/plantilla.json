@@ -48,5 +48,21 @@
       "hasta": null,
       "nota": "Viene todos los sábados por decisión propia. Revisar a fin de año (2026-12-31)."
     }
-  ]
+  ],
+  "nombresExcel": {
+    "BONET TORRES, ANTONIO": "Toni Bonet",
+    "BRUSTENGA BARBANY, ESTEVE": "Esteve",
+    "CARDOSO CARDOSO, JUAN CARLOS": "Juan Carlos",
+    "COSTA RIERA, ALEJANDRO": "Alex Costa",
+    "GIL VERDEJA, JAVIER": "Javi Gil",
+    "GUASCH RIBAS, ANTONIO": "Toni Guasch",
+    "MORENO LOPEZ, YAKOBA": "Yako",
+    "PEREZ PEREIRA, MANUEL": "Manolo Pérez",
+    "PERIAÑEZ ROSA, IVAN": "Iván",
+    "PRATS MARI, ANTONIO": "Toni Prats",
+    "RIBAS ROSELLO, JOSE": "Pep Ribas",
+    "ROS VERA, JOSE": "Pepe Ros",
+    "TORRES TUR, MARCOS": "Marcos",
+    "VAZQUEZ ARROYO, ADRIAN": "Adrián"
+  }
 }
