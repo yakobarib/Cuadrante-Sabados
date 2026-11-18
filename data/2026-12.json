@@ -1,0 +1,37 @@
+{
+  "mes": "2026-12",
+  "sabados": [
+    {
+      "fecha": "2026-12-05",
+      "grupo": 2,
+      "festivo": false,
+      "ausentes": [],
+      "sustituciones": []
+    },
+    {
+      "fecha": "2026-12-12",
+      "grupo": 1,
+      "festivo": false,
+      "ausentes": [
+        "Toni Prats"
+      ],
+      "sustituciones": []
+    },
+    {
+      "fecha": "2026-12-19",
+      "grupo": 2,
+      "festivo": false,
+      "ausentes": [
+        "Iván"
+      ],
+      "sustituciones": []
+    },
+    {
+      "fecha": "2026-12-26",
+      "grupo": 1,
+      "festivo": true,
+      "ausentes": [],
+      "sustituciones": []
+    }
+  ]
+}

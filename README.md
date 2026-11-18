@@ -136,3 +136,13 @@ Para ver la web en local, sirve la carpeta con cualquier servidor estático, por
 python -m http.server 8000
 # abrir http://localhost:8000/docs/
 ```
+
+## Importar un mes desde el Excel del sistema de horarios
+
+```
+pip install openpyxl
+python scripts/excel_a_cuadrante.py "informe.xlsx"
+```
+
+Genera `data/AAAA-MM.json` para cada mes del informe (no sobrescribe los que ya existen salvo con `--forzar`).
+Los rellenos rayados ("solicitado") no se cuentan como ausencia salvo con `--incluir-solicitados`; el script los avisa.

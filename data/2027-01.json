@@ -1,0 +1,49 @@
+{
+  "mes": "2027-01",
+  "sabados": [
+    {
+      "fecha": "2027-01-02",
+      "grupo": 2,
+      "festivo": false,
+      "ausentes": [
+        "Pep Ribas"
+      ],
+      "sustituciones": []
+    },
+    {
+      "fecha": "2027-01-09",
+      "grupo": 1,
+      "festivo": false,
+      "ausentes": [
+        "Toni Prats",
+        "Pep Ribas"
+      ],
+      "sustituciones": []
+    },
+    {
+      "fecha": "2027-01-16",
+      "grupo": 2,
+      "festivo": false,
+      "ausentes": [
+        "Pepe Ros"
+      ],
+      "sustituciones": []
+    },
+    {
+      "fecha": "2027-01-23",
+      "grupo": 1,
+      "festivo": false,
+      "ausentes": [
+        "Toni Prats"
+      ],
+      "sustituciones": []
+    },
+    {
+      "fecha": "2027-01-30",
+      "grupo": 2,
+      "festivo": false,
+      "ausentes": [],
+      "sustituciones": []
+    }
+  ]
+}

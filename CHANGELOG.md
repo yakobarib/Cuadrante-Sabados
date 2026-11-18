@@ -2,6 +2,13 @@
 
 Todas las novedades notables de este proyecto se documentan aquí.
 
+## [1.7.2] - 2026-11-18
+### Añadido
+- `scripts/excel_a_cuadrante.py`: convierte el "Informe calendario" Excel del sistema de horarios en los ficheros
+  `data/AAAA-MM.json` (ausentes por sábado según los colores de la leyenda, grupos alternando desde el último sábado
+  guardado, festivos). Sustituye a interpretar capturas de pantalla.
+- Cuadrantes de diciembre 2026 y enero 2027, generados con ese script.
+
 ## [1.7.1] - 2026-10-30
 ### Cambiado
 - Al abrir la web se carga el mes en curso (en vez del último mes creado). Si ese mes todavía no existe, abre el
