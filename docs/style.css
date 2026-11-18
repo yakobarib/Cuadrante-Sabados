@@ -486,6 +486,7 @@ button { font: inherit; cursor: pointer; }
   font-weight: 700;
   white-space: nowrap;
   list-style: none;
+  text-align: center;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 10px;

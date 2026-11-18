@@ -1250,8 +1250,15 @@ btnGuardar.addEventListener("click", async () => {
       );
       mesesPendientes.delete(mes);
     }
-    estadoGuardado.textContent = "✅ Guardado. Si hay alguna incidencia, te llegará un email en breve.";
+    const mensajeOk = "✅ Guardado. Si hay alguna incidencia, te llegará un email en breve.";
+    estadoGuardado.textContent = mensajeOk;
     actualizarAvisoSinGuardar();
+    setTimeout(() => {
+      if (estadoGuardado.textContent === mensajeOk) {
+        estadoGuardado.textContent = "";
+        actualizarAvisoSinGuardar();
+      }
+    }, 6000);
     await cargarListaMesesSinRecargar();
   } catch (e) {
     estadoGuardado.textContent = `❌ Error al guardar: ${e.message}`;

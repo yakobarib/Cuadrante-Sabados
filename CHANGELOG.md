@@ -2,6 +2,12 @@
 
 Todas las novedades notables de este proyecto se documentan aquí.
 
+## [1.8.1] - 2026-11-18
+### Cambiado
+- El mensaje «✅ Guardado…» desaparece solo a los pocos segundos (antes se quedaba en pantalla).
+- «📥 Importar Excel» pasa a estar entre «👥 Personal» y «🖨️ Imprimir mes».
+- El texto del botón «👥 Personal» queda centrado, como el de los demás botones.
+
 ## [1.8.0] - 2026-11-18
 ### Añadido
 - «📥 Importar Excel» (junto a «+ Nuevo mes»): se arrastra el «Informe calendario» del sistema de horarios, que puede
